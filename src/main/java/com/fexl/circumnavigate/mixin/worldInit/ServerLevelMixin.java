@@ -37,7 +37,7 @@ public class ServerLevelMixin {
 		//else if(dimension.equals(Level.NETHER)) {
 		//}
 		else {
-			thiz.setTransformer(new WorldTransformer(WrappingSettings.invalidPos));
+			thiz.setTransformer(WorldTransformer.INVALID);
 		}
 	}
 }

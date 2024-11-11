@@ -18,6 +18,6 @@ public class Circumnavigate implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		PayloadTypeRegistry.playS2C().register(LevelWrappingPayload.TYPE, LevelWrappingPayload.STREAM_CODEC);
+		PayloadTypeRegistry.configurationS2C().register(LevelWrappingPayload.TYPE, LevelWrappingPayload.STREAM_CODEC);
 	}
 }

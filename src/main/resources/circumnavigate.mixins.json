@@ -42,6 +42,7 @@
     "lightHandle.SkyLightEngineMixin",
     "packetHandle.PlayerChunkSenderMixin",
     "packetHandle.ServerCommonPacketListenerImplMixin",
+    "packetHandle.ServerConfigurationPacketListenerImplMixin",
     "packetHandle.ServerGamePacketListenerImplMixin",
     "packetHandle.ServerGamePacketListenerImplMixin_1",
     "packetHandle.packets.ClientboundLevelChunkWithLightPacketMixin",

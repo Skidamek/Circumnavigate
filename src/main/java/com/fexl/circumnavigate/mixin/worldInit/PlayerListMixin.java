@@ -31,19 +31,6 @@ public abstract class PlayerListMixin {
 	@Shadow private int viewDistance;
 
 	/**
-	 * Send a new player the wrappingSettings for the world.
-	 */
-	@Inject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/network/CommonListenerCookie;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
-	public void placeNewPlayer(Connection connection, ServerPlayer player, CommonListenerCookie cookie, CallbackInfo ci) {
-		for(ServerLevel level : this.getServer().getAllLevels()) {
-			if(level.getTransformer().equals(WorldTransformer.INVALID)) {
-				continue;
-			}
-			ServerPlayNetworking.send(player, new LevelWrappingPayload(level.dimension(), level.getTransformer()));
-		}
-	}
-
-	/**
 	 * Initializes the player's client-side positioning so they can be used for unwrapping operations.
 	 */
 	@Inject(method = "placeNewPlayer", at = @At("TAIL"))

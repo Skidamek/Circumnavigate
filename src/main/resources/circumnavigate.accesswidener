@@ -70,3 +70,14 @@ accessible field net/minecraft/network/protocol/game/ClientboundSectionBlocksUpd
 accessible field net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket positions [S
 accessible field net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket states [Lnet/minecraft/world/level/block/state/BlockState;
 
+accessible method net/minecraft/server/level/DistanceManager getChunk (J)Lnet/minecraft/server/level/ChunkHolder;
+accessible method net/minecraft/server/level/DistanceManager updateChunkScheduling (JILnet/minecraft/server/level/ChunkHolder;I)Lnet/minecraft/server/level/ChunkHolder;
+accessible field net/minecraft/server/level/DistanceManager chunksToUpdateFutures Ljava/util/Set;
+accessible class net/minecraft/server/level/DistanceManager$FixedPlayerDistanceChunkTracker
+accessible class net/minecraft/server/level/DistanceManager$PlayerTicketTracker
+accessible method net/minecraft/server/level/ChunkTracker update (JIZ)V
+accessible field net/minecraft/server/level/ChunkMap$TrackedEntity entity Lnet/minecraft/world/entity/Entity;
+accessible class net/minecraft/server/level/ChunkMap$DistanceManager
+accessible method net/minecraft/server/level/DistanceManager removePlayer (Lnet/minecraft/core/SectionPos;Lnet/minecraft/server/level/ServerPlayer;)V
+accessible method net/minecraft/server/level/DistanceManager addPlayer (Lnet/minecraft/core/SectionPos;Lnet/minecraft/server/level/ServerPlayer;)V
+

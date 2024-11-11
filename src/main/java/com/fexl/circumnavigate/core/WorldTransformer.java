@@ -59,11 +59,31 @@ public class WorldTransformer {
 
 	public static final WorldTransformer INVALID = new WorldTransformer(WrappingSettings.invalidPos);
 
-	public WorldTransformer(int xChunkBoundMin, int xChunkBoundMax, int zChunkBoundMin, int zChunkBoundMax, int xShift, int zShift) {
-		this.xChunkBoundMin = xChunkBoundMin;
-		this.xChunkBoundMax = xChunkBoundMax;
-		this.zChunkBoundMin = zChunkBoundMin;
-		this.zChunkBoundMax = zChunkBoundMax;
+	public WorldTransformer(int x1, int z1, int x2, int z2, int xShift, int zShift) {
+		int invalidPos = WrappingSettings.invalidPos;
+
+		//Not a wrapped world. Don't wrap.
+		if(Math.abs(x1) == invalidPos || Math.abs(z1) == invalidPos || Math.abs(x2) == invalidPos || Math.abs(z2) == invalidPos) {
+			//Set all values to impossibilities so no wrapping can take place
+			this.xChunkBoundMin = this.zChunkBoundMin = -invalidPos;
+			this.xChunkBoundMax = this.zChunkBoundMax = invalidPos;
+			xShift = zShift = 0;
+
+			//Not required, but eliminates unnecessary wrapping calculations for the client.
+			this.xTransformer = new FakeCoordinateTransformers();
+			this.zTransformer = new FakeCoordinateTransformers();
+		}
+		//Wrapped world. Wrap it.
+		else {
+			this.xChunkBoundMin = Math.min(x1, x2);
+			this.zChunkBoundMin = Math.min(z1, z2);
+			this.xChunkBoundMax = Math.max(x1, x2);
+			this.zChunkBoundMax = Math.max(z1, z2);
+
+
+			this.xTransformer = new CoordinateTransformers(this.xChunkBoundMin, this.xChunkBoundMax);
+			this.zTransformer = new CoordinateTransformers(this.zChunkBoundMin, this.zChunkBoundMax);
+		}
 
 		this.xCoordBoundMin = this.xChunkBoundMin * chunkWidth;
 		this.xCoordBoundMax = this.xChunkBoundMax * chunkWidth;
@@ -78,46 +98,28 @@ public class WorldTransformer {
 		this.xShift = xShift;
 		this.zShift = zShift;
 
-		this.xWidth = Math.abs(xChunkBoundMin) + Math.abs(xChunkBoundMax);
-		this.zWidth = Math.abs(zChunkBoundMin) + Math.abs(zChunkBoundMax);
+		this.xWidth = Math.abs(this.xChunkBoundMin) + Math.abs(this.xChunkBoundMax);
+		this.zWidth = Math.abs(this.zChunkBoundMin) + Math.abs(this.zChunkBoundMax);
 
 		this.xBlockWidth = this.xWidth*chunkWidth - 1;
 		this.zBlockWidth = this.zWidth*chunkWidth - 1;
 
 		this.centerX = (this.xChunkBoundMax + this.xChunkBoundMin) / 2;
 		this.centerZ = (this.zChunkBoundMax + this.zChunkBoundMin) / 2;
-
-		int invalidPos = WrappingSettings.invalidPos;
-
-		//Not a wrapped world. Don't wrap.
-		if(xChunkBoundMin == -invalidPos || xChunkBoundMax == invalidPos || zChunkBoundMin == -invalidPos || zChunkBoundMax == invalidPos) {
-			//Set all values to impossibilities so no wrapping can take place
-			xChunkBoundMin = xChunkBoundMax = zChunkBoundMin = zChunkBoundMax = invalidPos;
-			xShift = zShift = 0;
-
-			//Not required, but eliminates unnecessary wrapping calculations for the client.
-			this.xTransformer = new FakeCoordinateTransformers();
-			this.zTransformer = new FakeCoordinateTransformers();
-		}
-		//Wrapped world. Wrap it.
-		else {
-			this.xTransformer = new CoordinateTransformers(xChunkBoundMin, xChunkBoundMax);
-			this.zTransformer = new CoordinateTransformers(zChunkBoundMin, zChunkBoundMax);
-		}
 	}
 
 	/**
 	 * For bounds without chunk shifting.
 	 */
-	public WorldTransformer(int xChunkBoundMin, int xChunkBoundMax, int zChunkBoundMin, int zChunkBoundMax) {
-		this(xChunkBoundMin, xChunkBoundMax, zChunkBoundMin, zChunkBoundMax, 0, 0);
+	public WorldTransformer(int x1, int z1, int x2, int z2) {
+		this(x1, z1, x2, z2, 0, 0);
 	}
 
 	/**
 	 * For bounds centered at (0,0).
 	 */
 	public WorldTransformer(int xChunkBound, int zChunkBound) {
-		this(-xChunkBound, xChunkBound, -zChunkBound, zChunkBound);
+		this(-xChunkBound, -zChunkBound, xChunkBound, zChunkBound);
 	}
 
 	/**
@@ -125,6 +127,14 @@ public class WorldTransformer {
 	 */
 	public WorldTransformer(int chunkBound) {
 		this(chunkBound, chunkBound);
+	}
+
+	public WorldTransformer(ChunkPos min, ChunkPos max, int xShift, int zShift) {
+		this(min.x, min.z, max.x, max.z, xShift, zShift);
+	}
+
+	public WorldTransformer(ChunkPos min, ChunkPos max) {
+		this(min, max, 0, 0);
 	}
 
 	public Vec3 translateVecToBounds(Vec3 vec3) {
@@ -239,6 +249,10 @@ public class WorldTransformer {
 
 	public boolean isChunkOverBounds(ChunkPos chunkPos) {
 		return xTransformer.isChunkOverLimit(chunkPos.x) || zTransformer.isChunkOverLimit(chunkPos.z);
+	}
+
+	public boolean isBlockOverBounds(BlockPos blockPos) {
+		return xTransformer.isCoordOverLimit(blockPos.getX()) || zTransformer.isCoordOverLimit(blockPos.getZ());
 	}
 
 	@Override

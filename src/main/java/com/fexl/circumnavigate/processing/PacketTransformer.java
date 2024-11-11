@@ -13,11 +13,16 @@ import com.mojang.logging.LogUtils;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.level.ChunkPos;
@@ -105,37 +110,39 @@ public class PacketTransformer {
 	}
 
 	private static ClientboundLightUpdatePacket transformPacket(ClientboundLightUpdatePacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 
 		ChunkPos newPos = getClientChunkPos(player, new ChunkPos(packet.getX(), packet.getZ()));
 		buffer.writeVarInt(newPos.x);
 		buffer.writeVarInt(newPos.z);
 		packet.getLightData().write(buffer);
-		return new ClientboundLightUpdatePacket(buffer);
+		return ClientboundLightUpdatePacket.STREAM_CODEC.decode(buffer);
 	}
 
 	private static ClientboundSetChunkCacheCenterPacket transformPacket(ClientboundSetChunkCacheCenterPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
+		
 		ChunkPos newPos = getClientChunkPos(player, new ChunkPos(packet.getX(), packet.getZ()));
 		buffer.writeVarInt(newPos.x);
 		buffer.writeVarInt(newPos.z);
-		return new ClientboundSetChunkCacheCenterPacket(buffer);
+
+		return ClientboundSetChunkCacheCenterPacket.STREAM_CODEC.decode(buffer);
 	}
 
 	/**
 	private static ClientboundDamageEventPacket transformPacket(ClientboundDamageEventPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 	}**/
 
 	/**
 	private static ClientboundChunksBiomesPacket transformPacket(ClientboundChunksBiomesPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 	}**/
 
 
 	 private static ClientboundSoundPacket transformPacket(ClientboundSoundPacket packet, ServerPlayer player) {
-		 FriendlyByteBuf buffer = PacketByteBufs.create();
-		 buffer.writeId(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), packet.getSound(), (friendlyByteBuf, soundEvent) -> soundEvent.writeToNetwork(friendlyByteBuf));
+		 RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
+		 SoundEvent.STREAM_CODEC.encode(buffer, packet.getSound());
 		 buffer.writeEnum(packet.getSource());
 		 buffer.writeInt((int) (getClientX(player, packet.getX()) * 8.0));
 		 buffer.writeInt((int) (packet.getY() * 8.0));
@@ -144,12 +151,12 @@ public class PacketTransformer {
 		 buffer.writeFloat(packet.getPitch());
 		 buffer.writeLong(packet.getSeed());
 
-		 return new ClientboundSoundPacket(buffer);
+		 return ClientboundSoundPacket.STREAM_CODEC.decode(buffer);
 	 }
 
 
 	private static ClientboundExplodePacket transformPacket(ClientboundExplodePacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 
 		WorldTransformer transformer = player.serverLevel().getTransformer();
 
@@ -178,17 +185,15 @@ public class PacketTransformer {
 		buffer.writeFloat(packet.getKnockbackY());
 		buffer.writeFloat(packet.getKnockbackZ());
 		buffer.writeEnum(packet.getBlockInteraction());
-		packet.writeParticle(buffer, packet.getSmallExplosionParticles());
-		packet.writeParticle(buffer, packet.getLargeExplosionParticles());
-		packet.getExplosionSound().writeToNetwork(buffer);
-
-		return new ClientboundExplodePacket(buffer);
+		ParticleTypes.STREAM_CODEC.encode(buffer, packet.getSmallExplosionParticles());
+		SoundEvent.STREAM_CODEC.encode(buffer, packet.getExplosionSound());
+		
+		return ClientboundExplodePacket.STREAM_CODEC.decode(buffer);
 	}
 
 	private static ClientboundLevelParticlesPacket transformPacket(ClientboundLevelParticlesPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 
-		buffer.writeId(BuiltInRegistries.PARTICLE_TYPE, packet.getParticle().getType());
 		buffer.writeBoolean(packet.isOverrideLimiter());
 		buffer.writeDouble(getClientX(player, packet.getX()));
 		buffer.writeDouble(packet.getY());
@@ -198,52 +203,57 @@ public class PacketTransformer {
 		buffer.writeFloat(packet.getZDist());
 		buffer.writeFloat(packet.getMaxSpeed());
 		buffer.writeInt(packet.getCount());
-		packet.getParticle().writeToNetwork(buffer);
+		ParticleTypes.STREAM_CODEC.encode(buffer, packet.getParticle());
 
-		return new ClientboundLevelParticlesPacket(buffer);
+		return ClientboundLevelParticlesPacket.STREAM_CODEC.decode(buffer);
 	}
 
 	private static ClientboundOpenSignEditorPacket transformPacket(ClientboundOpenSignEditorPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeBlockPos(getClientBlockPos(player, packet.getPos()));
 		buffer.writeBoolean(packet.isFrontText());
-		return new ClientboundOpenSignEditorPacket(buffer);
+
+		return ClientboundOpenSignEditorPacket.STREAM_CODEC.decode(buffer);
 	}
 
 
 	private static ClientboundBlockEventPacket transformPacket(ClientboundBlockEventPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeBlockPos(getClientBlockPos(player, packet.getPos()));
 		buffer.writeByte(packet.getB0());
 		buffer.writeByte(packet.getB1());
-		buffer.writeId(BuiltInRegistries.BLOCK, packet.getBlock());
-		return new ClientboundBlockEventPacket(buffer);
+		ByteBufCodecs.registry(Registries.BLOCK).encode(buffer, packet.getBlock());
+
+		return ClientboundBlockEventPacket.STREAM_CODEC.decode(buffer);
+
 	}
 
 	private static ClientboundForgetLevelChunkPacket transformPacket(ClientboundForgetLevelChunkPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeChunkPos(getClientChunkPos(player, packet.pos()));
-		return new ClientboundForgetLevelChunkPacket(buffer);
+
+		return ClientboundForgetLevelChunkPacket.STREAM_CODEC.decode(buffer);
 	}
 
 	private static ClientboundBlockUpdatePacket transformPacket(ClientboundBlockUpdatePacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeBlockPos(getClientBlockPos(player, packet.getPos()));
-		buffer.writeId(Block.BLOCK_STATE_REGISTRY, packet.getBlockState());
-		return new ClientboundBlockUpdatePacket(buffer);
+		ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY).encode(buffer, packet.getBlockState());
+
+		return ClientboundBlockUpdatePacket.STREAM_CODEC.decode(buffer);
 	}
 
 	private static ClientboundBlockDestructionPacket transformPacket(ClientboundBlockDestructionPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeVarInt(packet.getId());
 		buffer.writeBlockPos(getClientBlockPos(player, packet.getPos()));
 		buffer.writeByte(packet.getProgress());
 
-		return new ClientboundBlockDestructionPacket(buffer);
+		return ClientboundBlockDestructionPacket.STREAM_CODEC.decode(buffer);
 	}
 
 	private static ClientboundSectionBlocksUpdatePacket transformPacket(ClientboundSectionBlocksUpdatePacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 
 		//Translate the SectionPos relative to the player
 		SectionPos originalSectionPos = packet.sectionPos;
@@ -257,39 +267,39 @@ public class PacketTransformer {
 			buffer.writeVarLong((long)Block.getId(packet.states[i]) << 12 | (long)packet.positions[i]);
 		}
 
-		return new ClientboundSectionBlocksUpdatePacket(buffer);
+		return ClientboundSectionBlocksUpdatePacket.STREAM_CODEC.decode(buffer);
 	}
 
 	private static ClientboundAddExperienceOrbPacket transformPacket(ClientboundAddExperienceOrbPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeVarInt(packet.getId());
 		buffer.writeDouble(getClientX(player, packet.getX()));
 		buffer.writeDouble(packet.getY());
 		buffer.writeDouble(getClientZ(player, packet.getZ()));
 		buffer.writeShort(packet.getValue());
 
-		return new ClientboundAddExperienceOrbPacket(buffer);
+		return ClientboundAddExperienceOrbPacket.STREAM_CODEC.decode(buffer);
 	}
 
 	/**
 	private static ClientboundPlayerLookAtPacket transformPacket(ClientboundPlayerLookAtPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 	}**/
 
 	private static ClientboundLevelEventPacket transformPacket(ClientboundLevelEventPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeInt(packet.getType());
 		buffer.writeBlockPos(getClientBlockPos(player, packet.getPos()));
 		buffer.writeInt(packet.getData());
 		buffer.writeBoolean(packet.isGlobalEvent());
 
-		return new ClientboundLevelEventPacket(buffer);
+		return ClientboundLevelEventPacket.STREAM_CODEC.decode(buffer);
 	}
 
 
 
 	private static ClientboundPlayerPositionPacket transformPacket(ClientboundPlayerPositionPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeDouble(getClientX(player, packet.getX()));
 		buffer.writeDouble(packet.getY());
 		buffer.writeDouble(getClientZ(player, packet.getZ()));
@@ -297,15 +307,16 @@ public class PacketTransformer {
 		buffer.writeFloat(packet.getXRot());
 		buffer.writeByte(RelativeMovement.pack(packet.getRelativeArguments()));
 		buffer.writeVarInt(packet.getId());
-		return new ClientboundPlayerPositionPacket(buffer);
+
+		return ClientboundPlayerPositionPacket.STREAM_CODEC.decode(buffer);
 	}
 
 
 	private static ClientboundAddEntityPacket transformPacket(ClientboundAddEntityPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeVarInt(packet.getId());
 		buffer.writeUUID(packet.getUUID());
-		buffer.writeId(BuiltInRegistries.ENTITY_TYPE, packet.getType());
+		ByteBufCodecs.registry(Registries.ENTITY_TYPE).encode(buffer, packet.getType());
 		buffer.writeDouble(getClientX(player, packet.getX()));
 		buffer.writeDouble(packet.getY());
 		buffer.writeDouble(getClientZ(player, packet.getZ()));
@@ -316,22 +327,23 @@ public class PacketTransformer {
 		buffer.writeShort((int) packet.getXa() / 8000);
 		buffer.writeShort((int) packet.getYa() / 8000);
 		buffer.writeShort((int) packet.getZa() / 8000);
-		return new ClientboundAddEntityPacket(buffer);
+
+		return ClientboundAddEntityPacket.STREAM_CODEC.decode(buffer);
 	}
 
 	private static ClientboundMoveVehiclePacket transformPacket(ClientboundMoveVehiclePacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeDouble(getClientX(player, packet.getX()));
 		buffer.writeDouble(packet.getY());
 		buffer.writeDouble(getClientZ(player, packet.getZ()));
 		buffer.writeFloat(packet.getYRot());
 		buffer.writeFloat(packet.getXRot());
 
-		return new ClientboundMoveVehiclePacket(buffer);
+		return ClientboundMoveVehiclePacket.STREAM_CODEC.decode(buffer);
 	}
 
 	private static ClientboundTeleportEntityPacket transformPacket(ClientboundTeleportEntityPacket packet, ServerPlayer player) {
-		FriendlyByteBuf buffer = PacketByteBufs.create();
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
 		buffer.writeVarInt(packet.getId());
 		buffer.writeDouble(getClientX(player, packet.getX()));
 		buffer.writeDouble(packet.getY());
@@ -339,12 +351,13 @@ public class PacketTransformer {
 		buffer.writeByte(packet.getyRot());
 		buffer.writeByte(packet.getxRot());
 		buffer.writeBoolean(packet.isOnGround());
-		return new ClientboundTeleportEntityPacket(buffer);
+
+		return ClientboundTeleportEntityPacket.STREAM_CODEC.decode(buffer);
 	}
 
 
 	private static ClientboundBundlePacket transformPacket(ClientboundBundlePacket packet, ServerPlayer player) {
-		List<Packet<ClientGamePacketListener>> outputPackets = new ArrayList<>();
+		List<Packet<? super ClientGamePacketListener>> outputPackets = new ArrayList<>();
 		packet.subPackets().forEach((subPacket) -> {
 			outputPackets.add((Packet<ClientGamePacketListener>) PacketTransformer.process(subPacket, player));
 		});

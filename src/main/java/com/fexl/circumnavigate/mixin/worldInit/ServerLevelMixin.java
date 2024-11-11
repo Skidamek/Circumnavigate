@@ -32,10 +32,9 @@ public class ServerLevelMixin {
 	@Inject(method = "<init>(Lnet/minecraft/server/MinecraftServer;Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/world/level/storage/ServerLevelData;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/dimension/LevelStem;Lnet/minecraft/server/level/progress/ChunkProgressListener;ZJLjava/util/List;ZLnet/minecraft/world/RandomSequences;)V", at = @At("TAIL"))
 	public void init(MinecraftServer server, Executor dispatcher, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey dimension, LevelStem levelStem, ChunkProgressListener progressListener, boolean isDebug, long biomeZoomSeed, List customSpawners, boolean tickTime, RandomSequences randomSequences, CallbackInfo ci) {
 		if(dimension.equals(Level.OVERWORLD)) {
-			thiz.setTransformer(new WorldTransformer(WrappingSettings.getXChunkBoundMin(), WrappingSettings.getXChunkBoundMax(), WrappingSettings.getZChunkBoundMin(), WrappingSettings.getZChunkBoundMax(), WrappingSettings.getXShift(),  WrappingSettings.getZShift()));
+			thiz.setTransformer(new WorldTransformer(WrappingSettings.getXChunkBoundMin(), WrappingSettings.getZChunkBoundMin(), WrappingSettings.getXChunkBoundMax(), WrappingSettings.getZChunkBoundMax(), WrappingSettings.getXShift(),  WrappingSettings.getZShift()));
 		}
 		//else if(dimension.equals(Level.NETHER)) {
-			//thiz.setTransformer(new WorldTransformer(WrappingSettings.getXChunkBoundMin()/8, WrappingSettings.getXChunkBoundMax()/8, WrappingSettings.getZChunkBoundMin()/8, WrappingSettings.getZChunkBoundMax()/8, WrappingSettings.getXShift(),  WrappingSettings.getZShift()));
 		//}
 		else {
 			thiz.setTransformer(new WorldTransformer(WrappingSettings.invalidPos));

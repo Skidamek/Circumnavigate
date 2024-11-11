@@ -18,6 +18,7 @@ public class ChunkGeneratorMixin implements LevelAccessor {
 	/**
 	 * Cancel if beyond chunk bounds.
 	 */
+	/**
     @Inject(method = "applyBiomeDecoration", at = @At("HEAD"), cancellable = true)
     public void decorateOverBoundsCancel(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager, CallbackInfo ci) {
         this.setLevel(level.getLevel());
@@ -25,7 +26,7 @@ public class ChunkGeneratorMixin implements LevelAccessor {
         WorldTransformer transformer = level.getLevel().getTransformer();
 
         if(transformer.isChunkOverBounds(chunk.getPos())) ci.cancel();
-    }
+    }**/
 
     @Unique
     ServerLevel level;

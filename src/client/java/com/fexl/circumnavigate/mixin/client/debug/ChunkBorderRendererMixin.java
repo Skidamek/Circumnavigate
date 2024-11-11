@@ -62,58 +62,58 @@ public class ChunkBorderRendererMixin {
 		//Red lines showing distant chunk borders
 		for (j = -16; j <= 32; j += 16) {
 			for (k = -16; k <= 32; k += 16) {
-				vertexConsumer.vertex(matrix4f, h + (float)j, f, i + (float)k).color(1.0f, 0.0f, 0.0f, 0.0f).endVertex();
+				vertexConsumer.addVertex(matrix4f, h + (float)j, f, i + (float)k).setColor(1.0f, 0.0f, 0.0f, 0.0f);
 				//Set purple
 				if(onBounds(chunkPos.x, j, transformer.xChunkBoundMin, transformer.xWidth) || onBounds(chunkPos.x, j, transformer.xChunkBoundMax, transformer.xWidth) || onBounds(chunkPos.z, k, transformer.zChunkBoundMin, transformer.zWidth) || onBounds(chunkPos.z, k, transformer.zChunkBoundMax, transformer.zWidth)) {
-					vertexConsumer.vertex(matrix4f, h + (float)j, f, i + (float)k).color(DARK_PURPLE).endVertex();
-					vertexConsumer.vertex(matrix4f, h + (float)j, g, i + (float)k).color(DARK_PURPLE).endVertex();
+					vertexConsumer.addVertex(matrix4f, h + (float)j, f, i + (float)k).setColor(DARK_PURPLE);
+					vertexConsumer.addVertex(matrix4f, h + (float)j, g, i + (float)k).setColor(DARK_PURPLE);
 				}
 				//Set red
 				else {
-					vertexConsumer.vertex(matrix4f, h + (float)j, f, i + (float)k).color(1.0f, 0.0f, 0.0f, 0.5f).endVertex();
-					vertexConsumer.vertex(matrix4f, h + (float)j, g, i + (float)k).color(1.0f, 0.0f, 0.0f, 0.5f).endVertex();
+					vertexConsumer.addVertex(matrix4f, h + (float)j, f, i + (float)k).setColor(1.0f, 0.0f, 0.0f, 0.5f);
+					vertexConsumer.addVertex(matrix4f, h + (float)j, g, i + (float)k).setColor(1.0f, 0.0f, 0.0f, 0.5f);
 				}
-				vertexConsumer.vertex(matrix4f, h + (float)j, g, i + (float)k).color(1.0f, 0.0f, 0.0f, 0.0f).endVertex();
+				vertexConsumer.addVertex(matrix4f, h + (float)j, g, i + (float)k).setColor(1.0f, 0.0f, 0.0f, 0.0f);
 			}
 		}
 
 		//Yellow/green vertical for north and south
 		for (j = 2; j < 16; j += 2) {
 			k = j % 4 == 0 ? CELL_BORDER : YELLOW;
-			vertexConsumer.vertex(matrix4f, h + (float)j, f, i).color(1.0f, 1.0f, 0.0f, 0.0f).endVertex();
-			vertexConsumer.vertex(matrix4f, h + (float)j, f, i).color(k).endVertex();
-			vertexConsumer.vertex(matrix4f, h + (float)j, g, i).color(k).endVertex();
-			vertexConsumer.vertex(matrix4f, h + (float)j, g, i).color(1.0f, 1.0f, 0.0f, 0.0f).endVertex();
-			vertexConsumer.vertex(matrix4f, h + (float)j, f, i + 16.0f).color(1.0f, 1.0f, 0.0f, 0.0f).endVertex();
-			vertexConsumer.vertex(matrix4f, h + (float)j, f, i + 16.0f).color(k).endVertex();
-			vertexConsumer.vertex(matrix4f, h + (float)j, g, i + 16.0f).color(k).endVertex();
-			vertexConsumer.vertex(matrix4f, h + (float)j, g, i + 16.0f).color(1.0f, 1.0f, 0.0f, 0.0f).endVertex();
+			vertexConsumer.addVertex(matrix4f, h + (float)j, f, i).setColor(1.0f, 1.0f, 0.0f, 0.0f);
+			vertexConsumer.addVertex(matrix4f, h + (float)j, f, i).setColor(k);
+			vertexConsumer.addVertex(matrix4f, h + (float)j, g, i).setColor(k);
+			vertexConsumer.addVertex(matrix4f, h + (float)j, g, i).setColor(1.0f, 1.0f, 0.0f, 0.0f);
+			vertexConsumer.addVertex(matrix4f, h + (float)j, f, i + 16.0f).setColor(1.0f, 1.0f, 0.0f, 0.0f);
+			vertexConsumer.addVertex(matrix4f, h + (float)j, f, i + 16.0f).setColor(k);
+			vertexConsumer.addVertex(matrix4f, h + (float)j, g, i + 16.0f).setColor(k);
+			vertexConsumer.addVertex(matrix4f, h + (float)j, g, i + 16.0f).setColor(1.0f, 1.0f, 0.0f, 0.0f);
 		}
 
 		//Yellow/green vertical for east and west
 		for (j = 2; j < 16; j += 2) {
 			k = j % 4 == 0 ? CELL_BORDER : YELLOW;
-			vertexConsumer.vertex(matrix4f, h, f, i + (float)j).color(1.0f, 1.0f, 0.0f, 0.0f).endVertex();
-			vertexConsumer.vertex(matrix4f, h, f, i + (float)j).color(k).endVertex();
-			vertexConsumer.vertex(matrix4f, h, g, i + (float)j).color(k).endVertex();
-			vertexConsumer.vertex(matrix4f, h, g, i + (float)j).color(1.0f, 1.0f, 0.0f, 0.0f).endVertex();
-			vertexConsumer.vertex(matrix4f, h + 16.0f, f, i + (float)j).color(1.0f, 1.0f, 0.0f, 0.0f).endVertex();
-			vertexConsumer.vertex(matrix4f, h + 16.0f, f, i + (float)j).color(k).endVertex();
-			vertexConsumer.vertex(matrix4f, h + 16.0f, g, i + (float)j).color(k).endVertex();
-			vertexConsumer.vertex(matrix4f, h + 16.0f, g, i + (float)j).color(1.0f, 1.0f, 0.0f, 0.0f).endVertex();
+			vertexConsumer.addVertex(matrix4f, h, f, i + (float)j).setColor(1.0f, 1.0f, 0.0f, 0.0f);
+			vertexConsumer.addVertex(matrix4f, h, f, i + (float)j).setColor(k);
+			vertexConsumer.addVertex(matrix4f, h, g, i + (float)j).setColor(k);
+			vertexConsumer.addVertex(matrix4f, h, g, i + (float)j).setColor(1.0f, 1.0f, 0.0f, 0.0f);
+			vertexConsumer.addVertex(matrix4f, h + 16.0f, f, i + (float)j).setColor(1.0f, 1.0f, 0.0f, 0.0f);
+			vertexConsumer.addVertex(matrix4f, h + 16.0f, f, i + (float)j).setColor(k);
+			vertexConsumer.addVertex(matrix4f, h + 16.0f, g, i + (float)j).setColor(k);
+			vertexConsumer.addVertex(matrix4f, h + 16.0f, g, i + (float)j).setColor(1.0f, 1.0f, 0.0f, 0.0f);
 		}
 
 		//Yellow/green horizontal for all directions
 		for (j = am.getMinecraft().level.getMinBuildHeight(); j <= am.getMinecraft().level.getMaxBuildHeight(); j += 2) {
 			float l = (float)((double)j - camY);
 			int m = j % 8 == 0 ? CELL_BORDER : YELLOW;
-			vertexConsumer.vertex(matrix4f, h, l, i).color(1.0f, 1.0f, 0.0f, 0.0f).endVertex();
-			vertexConsumer.vertex(matrix4f, h, l, i).color(m).endVertex();
-			vertexConsumer.vertex(matrix4f, h, l, i + 16.0f).color(m).endVertex();
-			vertexConsumer.vertex(matrix4f, h + 16.0f, l, i + 16.0f).color(m).endVertex();
-			vertexConsumer.vertex(matrix4f, h + 16.0f, l, i).color(m).endVertex();
-			vertexConsumer.vertex(matrix4f, h, l, i).color(m).endVertex();
-			vertexConsumer.vertex(matrix4f, h, l, i).color(1.0f, 1.0f, 0.0f, 0.0f).endVertex();
+			vertexConsumer.addVertex(matrix4f, h, l, i).setColor(1.0f, 1.0f, 0.0f, 0.0f);
+			vertexConsumer.addVertex(matrix4f, h, l, i).setColor(m);
+			vertexConsumer.addVertex(matrix4f, h, l, i + 16.0f).setColor(m);
+			vertexConsumer.addVertex(matrix4f, h + 16.0f, l, i + 16.0f).setColor(m);
+			vertexConsumer.addVertex(matrix4f, h + 16.0f, l, i).setColor(m);
+			vertexConsumer.addVertex(matrix4f, h, l, i).setColor(m);
+			vertexConsumer.addVertex(matrix4f, h, l, i).setColor(1.0f, 1.0f, 0.0f, 0.0f);
 		}
 
 		vertexConsumer = buffer.getBuffer(RenderType.debugLineStrip(2.0));
@@ -122,17 +122,17 @@ public class ChunkBorderRendererMixin {
 		for (j = 0; j <= 16; j += 16) {
 			for (int k2 = 0; k2 <= 16; k2 += 16) {
 				//Set purple
-				if(onBounds(chunkPos.x, j, transformer.xChunkBoundMin, transformer.xWidth) || onBounds(chunkPos.x, j, transformer.xChunkBoundMax, transformer.xWidth) || onBounds(chunkPos.z, k2, transformer.zChunkBoundMin, transformer.zWidth) || onBounds(chunkPos.z, k2, transformer.zChunkBoundMax, transformer.zWidth)) {vertexConsumer.vertex(matrix4f, h + (float)j, f, i + (float)k2).color(PURPLE_CLEAR).endVertex();
-					vertexConsumer.vertex(matrix4f, h + (float)j, f, i + (float)k2).color(PURPLE).endVertex();
-					vertexConsumer.vertex(matrix4f, h + (float)j, g, i + (float)k2).color(PURPLE).endVertex();
-					vertexConsumer.vertex(matrix4f, h + (float)j, g, i + (float)k2).color(PURPLE_CLEAR).endVertex();
+				if(onBounds(chunkPos.x, j, transformer.xChunkBoundMin, transformer.xWidth) || onBounds(chunkPos.x, j, transformer.xChunkBoundMax, transformer.xWidth) || onBounds(chunkPos.z, k2, transformer.zChunkBoundMin, transformer.zWidth) || onBounds(chunkPos.z, k2, transformer.zChunkBoundMax, transformer.zWidth)) {vertexConsumer.addVertex(matrix4f, h + (float)j, f, i + (float)k2).setColor(PURPLE_CLEAR);
+					vertexConsumer.addVertex(matrix4f, h + (float)j, f, i + (float)k2).setColor(PURPLE);
+					vertexConsumer.addVertex(matrix4f, h + (float)j, g, i + (float)k2).setColor(PURPLE);
+					vertexConsumer.addVertex(matrix4f, h + (float)j, g, i + (float)k2).setColor(PURPLE_CLEAR);
 				}
 				//Set red
 				else {
-					vertexConsumer.vertex(matrix4f, h + (float)j, f, i + (float)k2).color(0.25f, 0.25f, 1.0f, 0.0f).endVertex();
-					vertexConsumer.vertex(matrix4f, h + (float)j, f, i + (float)k2).color(0.25f, 0.25f, 1.0f, 1.0f).endVertex();
-					vertexConsumer.vertex(matrix4f, h + (float)j, g, i + (float)k2).color(0.25f, 0.25f, 1.0f, 1.0f).endVertex();
-					vertexConsumer.vertex(matrix4f, h + (float)j, g, i + (float)k2).color(0.25f, 0.25f, 1.0f, 0.0f).endVertex();
+					vertexConsumer.addVertex(matrix4f, h + (float)j, f, i + (float)k2).setColor(0.25f, 0.25f, 1.0f, 0.0f);
+					vertexConsumer.addVertex(matrix4f, h + (float)j, f, i + (float)k2).setColor(0.25f, 0.25f, 1.0f, 1.0f);
+					vertexConsumer.addVertex(matrix4f, h + (float)j, g, i + (float)k2).setColor(0.25f, 0.25f, 1.0f, 1.0f);
+					vertexConsumer.addVertex(matrix4f, h + (float)j, g, i + (float)k2).setColor(0.25f, 0.25f, 1.0f, 0.0f);
 				}
 			}
 		}
@@ -141,49 +141,49 @@ public class ChunkBorderRendererMixin {
 		for (j = am.getMinecraft().level.getMinBuildHeight(); j <= am.getMinecraft().level.getMaxBuildHeight(); j += 16) {
 			float l = (float)((double)j - camY);
 
-			vertexConsumer.vertex(matrix4f, h, l, i).color(0.25f, 0.25f, 1.0f, 0.0f).endVertex();
+			vertexConsumer.addVertex(matrix4f, h, l, i).setColor(0.25f, 0.25f, 1.0f, 0.0f);
 
 			//Northwest to southwest
 			if(onBounds(chunkPos.x, 0, transformer.xChunkBoundMin, transformer.xWidth) || onBounds(chunkPos.x, 0, transformer.xChunkBoundMax, transformer.xWidth)) {
-				vertexConsumer.vertex(matrix4f, h, l, i).color(PURPLE).endVertex();
-				vertexConsumer.vertex(matrix4f, h, l, i + 16.0f).color(PURPLE).endVertex();
+				vertexConsumer.addVertex(matrix4f, h, l, i).setColor(PURPLE);
+				vertexConsumer.addVertex(matrix4f, h, l, i + 16.0f).setColor(PURPLE);
 			}
 			else {
-				vertexConsumer.vertex(matrix4f, h, l, i).color(0.25f, 0.25f, 1.0f, 1.0f).endVertex();
-				vertexConsumer.vertex(matrix4f, h, l, i + 16.0f).color(0.25f, 0.25f, 1.0f, 1.0f).endVertex();
+				vertexConsumer.addVertex(matrix4f, h, l, i).setColor(0.25f, 0.25f, 1.0f, 1.0f);
+				vertexConsumer.addVertex(matrix4f, h, l, i + 16.0f).setColor(0.25f, 0.25f, 1.0f, 1.0f);
 			}
 
 			//Southwest to southeast
 			if(onBounds(chunkPos.z + 1, 0, transformer.zChunkBoundMin, transformer.zWidth) || onBounds(chunkPos.z + 1, 0, transformer.zChunkBoundMax, transformer.zWidth)) {
-				vertexConsumer.vertex(matrix4f, h, l, i + 16.0f).color(PURPLE).endVertex();
-				vertexConsumer.vertex(matrix4f, h + 16.0f, l, i + 16.0f).color(PURPLE).endVertex();
+				vertexConsumer.addVertex(matrix4f, h, l, i + 16.0f).setColor(PURPLE);
+				vertexConsumer.addVertex(matrix4f, h + 16.0f, l, i + 16.0f).setColor(PURPLE);
 			}
 			else {
-				vertexConsumer.vertex(matrix4f, h, l, i + 16.0f).color(0.25f, 0.25f, 1.0f, 1.0f).endVertex();
-				vertexConsumer.vertex(matrix4f, h + 16.0f, l, i + 16.0f).color(0.25f, 0.25f, 1.0f, 1.0f).endVertex();
+				vertexConsumer.addVertex(matrix4f, h, l, i + 16.0f).setColor(0.25f, 0.25f, 1.0f, 1.0f);
+				vertexConsumer.addVertex(matrix4f, h + 16.0f, l, i + 16.0f).setColor(0.25f, 0.25f, 1.0f, 1.0f);
 			}
 
 			//Southeast to northeast
 			if(onBounds(chunkPos.x + 1, 0, transformer.xChunkBoundMin, transformer.xWidth) || onBounds(chunkPos.x + 1, 0, transformer.xChunkBoundMax, transformer.xWidth)) {
-				vertexConsumer.vertex(matrix4f, h + 16.0f, l, i + 16.0f).color(PURPLE).endVertex();
-				vertexConsumer.vertex(matrix4f, h + 16.0f, l, i).color(PURPLE).endVertex();
+				vertexConsumer.addVertex(matrix4f, h + 16.0f, l, i + 16.0f).setColor(PURPLE);
+				vertexConsumer.addVertex(matrix4f, h + 16.0f, l, i).setColor(PURPLE);
 			}
 			else {
-				vertexConsumer.vertex(matrix4f, h + 16.0f, l, i + 16.0f).color(0.25f, 0.25f, 1.0f, 1.0f).endVertex();
-				vertexConsumer.vertex(matrix4f, h + 16.0f, l, i).color(0.25f, 0.25f, 1.0f, 1.0f).endVertex();
+				vertexConsumer.addVertex(matrix4f, h + 16.0f, l, i + 16.0f).setColor(0.25f, 0.25f, 1.0f, 1.0f);
+				vertexConsumer.addVertex(matrix4f, h + 16.0f, l, i).setColor(0.25f, 0.25f, 1.0f, 1.0f);
 			}
 
 			//Northeast to northwest
 			if(onBounds(chunkPos.z, 0, transformer.zChunkBoundMin, transformer.zWidth) || onBounds(chunkPos.z, 0, transformer.zChunkBoundMax, transformer.zWidth)) {
-				vertexConsumer.vertex(matrix4f, h + 16.0f, l, i).color(PURPLE).endVertex();
-				vertexConsumer.vertex(matrix4f, h, l, i).color(PURPLE).endVertex();
+				vertexConsumer.addVertex(matrix4f, h + 16.0f, l, i).setColor(PURPLE);
+				vertexConsumer.addVertex(matrix4f, h, l, i).setColor(PURPLE);
 			}
 			else {
-				vertexConsumer.vertex(matrix4f, h + 16.0f, l, i).color(0.25f, 0.25f, 1.0f, 1.0f).endVertex();
-				vertexConsumer.vertex(matrix4f, h, l, i).color(0.25f, 0.25f, 1.0f, 1.0f).endVertex();
+				vertexConsumer.addVertex(matrix4f, h + 16.0f, l, i).setColor(0.25f, 0.25f, 1.0f, 1.0f);
+				vertexConsumer.addVertex(matrix4f, h, l, i).setColor(0.25f, 0.25f, 1.0f, 1.0f);
 			}
 
-			vertexConsumer.vertex(matrix4f, h, l, i).color(0.25f, 0.25f, 1.0f, 0.0f).endVertex();
+			vertexConsumer.addVertex(matrix4f, h, l, i).setColor(0.25f, 0.25f, 1.0f, 0.0f);
 		}
 	}
 }

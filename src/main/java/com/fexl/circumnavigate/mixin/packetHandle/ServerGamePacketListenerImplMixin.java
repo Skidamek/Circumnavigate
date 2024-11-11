@@ -43,26 +43,11 @@ public abstract class ServerGamePacketListenerImplMixin {
 	@Shadow
 	public ServerPlayer player;
 
-	@Redirect(method = "handleUseItemOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;distanceToSqr(Lnet/minecraft/world/phys/Vec3;)D", ordinal = 0))
-	public double wrapDistanceSquared1(Vec3 instance, Vec3 vec) {
-		WorldTransformer transformer = player.serverLevel().getTransformer();
-		return transformer.distanceToSqrWrapped(instance, vec);
-	}
-
-
 	@Redirect(method = "handleUseItemOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;subtract(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;", ordinal = 0))
 	public Vec3 unwrapVec(Vec3 instance, Vec3 vec) {
 		WorldTransformer transformer = player.serverLevel().getTransformer();
 		return instance.subtract(transformer.translateVecFromBounds(instance, vec));
 	}
-
-
-	@Redirect(method = "handleInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/AABB;distanceToSqr(Lnet/minecraft/world/phys/Vec3;)D", ordinal = 0))
-	public double wrapDistanceSquared2(AABB aabb, Vec3 vec) {
-		WorldTransformer transformer = player.serverLevel().getTransformer();
-		return transformer.distanceToSqrWrapped(aabb, vec);
-	}
-
 
 	@ModifyArg(method = "handlePlayerAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;handleBlockBreakAction(Lnet/minecraft/core/BlockPos;Lnet/minecraft/network/protocol/game/ServerboundPlayerActionPacket$Action;Lnet/minecraft/core/Direction;II)V"), index = 0)
 	public BlockPos wrapBlockPos(BlockPos pos) {
@@ -217,7 +202,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 		thiz.clientIsFloating = s >= -0.03125 && !bl22 && thiz.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR && !thiz.server.isFlightAllowed() && !thiz.player.getAbilities().mayfly && !thiz.player.hasEffect(MobEffects.LEVITATION) && !thiz.player.isFallFlying() && !thiz.player.isAutoSpinAttack() && thiz.noBlocksAround(thiz.player);
 		thiz.player.serverLevel().getChunkSource().move(thiz.player);
 		thiz.player.doCheckFallDamage(thiz.player.getX() - i, thiz.player.getY() - j, thiz.player.getZ() - k, packet.isOnGround());
-		thiz.player.setOnGroundWithKnownMovement(packet.isOnGround(), new Vec3(thiz.player.getX() - i, thiz.player.getY() - j, thiz.player.getZ() - k));
+		thiz.player.setKnownMovement(new Vec3(thiz.player.getX() - i, thiz.player.getY() - j, thiz.player.getZ() - k));
 		if (bl) {
 			thiz.player.resetFallDistance();
 		}

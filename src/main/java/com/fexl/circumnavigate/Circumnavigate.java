@@ -2,9 +2,15 @@
 
 package com.fexl.circumnavigate;
 
+import com.fexl.circumnavigate.network.packet.LevelWrappingPayload;
+import com.fexl.circumnavigate.network.packet.LevelWrappingRequest;
 import net.fabricmc.api.ModInitializer;
 
-import net.minecraft.core.Registry;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 
 
 public class Circumnavigate implements ModInitializer {
@@ -12,5 +18,6 @@ public class Circumnavigate implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		PayloadTypeRegistry.playS2C().register(LevelWrappingPayload.TYPE, LevelWrappingPayload.STREAM_CODEC);
 	}
 }

@@ -2,18 +2,18 @@
 
 package com.fexl.circumnavigate.mixin.worldInit;
 
-import com.fexl.circumnavigate.network.packet.ClientboundWrappingDataPacket;
 import com.fexl.circumnavigate.core.WorldTransformer;
+import com.fexl.circumnavigate.network.packet.LevelWrappingPayload;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.players.PlayerList;
-import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +22,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Mixin(PlayerList.class)
@@ -36,12 +35,12 @@ public abstract class PlayerListMixin {
 	 */
 	@Inject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/network/CommonListenerCookie;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
 	public void placeNewPlayer(Connection connection, ServerPlayer player, CommonListenerCookie cookie, CallbackInfo ci) {
-		HashMap<ResourceKey<Level>, WorldTransformer> transformers = new HashMap<>();
 		for(ServerLevel level : this.getServer().getAllLevels()) {
-			transformers.put(level.dimension(), level.getTransformer());
+			if(level.getTransformer().equals(WorldTransformer.INVALID)) {
+				continue;
+			}
+			ServerPlayNetworking.send(player, new LevelWrappingPayload(level.dimension(), level.getTransformer()));
 		}
-
-		ClientboundWrappingDataPacket.send(player, transformers);
 	}
 
 	/**

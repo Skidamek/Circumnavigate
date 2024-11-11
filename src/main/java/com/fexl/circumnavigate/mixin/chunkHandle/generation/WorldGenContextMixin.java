@@ -18,9 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldGenContext.class)
 public class WorldGenContextMixin {
-	/**
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void init(ServerLevel serverLevel, ChunkGenerator chunkGenerator, StructureTemplateManager structureTemplateManager, ThreadedLevelLightEngine threadedLevelLightEngine, ProcessorHandle processorHandle, CallbackInfo ci) {
 		((LevelAccessor) chunkGenerator).setLevel(serverLevel);
-	}**/
+	}
 }

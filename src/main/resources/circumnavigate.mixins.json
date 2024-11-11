@@ -26,7 +26,6 @@
     "entityHandle.LivingEntityMixin",
     "entityHandle.PlayerMixin",
     "entityHandle.ServerEntityMixin",
-    "entityHandle.collisions.BlockCollisionsMixin",
     "entityHandle.collisions.EntityGetterMixin",
     "entityHandle.collisions.HitResultMixin",
     "entityHandle.collisions.LevelMixin",

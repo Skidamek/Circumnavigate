@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class NoiseBasedChunkGeneratorMixin {
     ServerLevel level;
     ChunkPos chunkPos;
-	/**
+
     @Inject(method = "applyCarvers", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/WorldgenRandom;setLargeFeatureSeed(JII)V"))
     public void carveOverBoundsCancel(WorldGenRegion level, long seed, RandomState random, BiomeManager biomeManager, StructureManager structureManager, ChunkAccess chunk, GenerationStep.Carving step, CallbackInfo ci, @Local ConfiguredWorldCarver<?> configuredWorldCarver) {
         this.level = level.getLevel();
@@ -54,6 +54,6 @@ public class NoiseBasedChunkGeneratorMixin {
 
         if(level.getTransformer().isChunkOverBounds(chunkPos)) return true;
         return original.call(chunkPos);
-    }**/
+    }
 
 }

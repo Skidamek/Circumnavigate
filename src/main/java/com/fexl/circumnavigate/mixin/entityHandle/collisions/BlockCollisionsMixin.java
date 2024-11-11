@@ -31,6 +31,9 @@ public abstract class BlockCollisionsMixin<T> extends AbstractIterator<T> {
 	private void wrap3DCursor(CollisionGetter collisionGetter, Entity entity, AABB box, boolean onlySuffocatingBlocks, BiFunction<BlockPos.MutableBlockPos, VoxelShape, T> resultProvider, CallbackInfo ci) {
 		if(collisionGetter instanceof Level level && level.isClientSide) return;
 
+		//TODO: this cannot be applied to a certain subset of precursor levels. These are the current exclusions, but more may be required.
+		if(!(collisionGetter instanceof Level) && !(collisionGetter instanceof PathNavigationRegion)) return;
+
 		int i = Mth.floor(box.minX - 1.0E-7) - 1;
 		int j = Mth.floor(box.maxX + 1.0E-7) + 1;
 		int k = Mth.floor(box.minY - 1.0E-7) - 1;

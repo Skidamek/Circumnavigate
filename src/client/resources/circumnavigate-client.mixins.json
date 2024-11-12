@@ -12,7 +12,6 @@
       "chunkHandle.OptionsAccessorMixin",
       "chunkHandle.OptionsMixin",
 
-      "debug.ChunkBorderRendererAccessorMixin",
       "debug.ChunkBorderRendererMixin",
       "debug.DebugScreenOverlayMixin",
 

@@ -4,11 +4,15 @@ package com.fexl.circumnavigate.mixin.client.worldInit;
 
 import com.fexl.circumnavigate.client.storage.TransformersStorage;
 import com.fexl.circumnavigate.core.WorldTransformer;
+import com.fexl.circumnavigate.network.packet.LevelWrappingRequest;
+import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
+import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,7 +30,7 @@ public class ClientLevelMixin {
 	 * Set the world transformer for the ClientLevel depending on the requested dimension.
 	 */
 	@Inject(method = "<init>", at = @At("TAIL"))
-	public void init(ClientPacketListener connection, ClientLevel.ClientLevelData clientLevelData, ResourceKey dimension, Holder dimensionType, int viewDistance, int serverSimulationDistance, Supplier profiler, LevelRenderer levelRenderer, boolean isDebug, long biomeZoomSeed, CallbackInfo ci) {
+	public void init(ClientPacketListener connection, ClientLevel.ClientLevelData clientLevelData, ResourceKey<Level> dimension, Holder dimensionType, int viewDistance, int serverSimulationDistance, Supplier profiler, LevelRenderer levelRenderer, boolean isDebug, long biomeZoomSeed, CallbackInfo ci) {
 		thiz.setTransformer(TransformersStorage.getTransformer(dimension));
 	}
 

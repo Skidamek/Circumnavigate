@@ -15,9 +15,13 @@ import java.util.stream.Stream;
 public class BlockPosWrapped extends BlockPos {
     final WorldTransformer transformer;
     public BlockPosWrapped(BlockPos blockPos, WorldTransformer transformer) {
-        super(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        super(transformer.xTransformer.wrapCoordToLimit(blockPos.getX()), blockPos.getY(), transformer.xTransformer.wrapCoordToLimit(blockPos.getZ()));
         this.transformer = transformer;
     }
+
+	private BlockPosWrapped(int x, int y, int z, WorldTransformer transformer) {
+		this(new BlockPos(x, y, z), transformer);
+	}
 
     public static long offset(long pos, int dx, int dy, int dz, Level level) {
         return level.getTransformer().translateBlockToBounds(asLong(getX(pos) + dx, getY(pos) + dy, getZ(pos) + dz));
@@ -25,7 +29,7 @@ public class BlockPosWrapped extends BlockPos {
 
     @Override
     public @NotNull BlockPos offset(int dx, int dy, int dz) {
-        return dx == 0 && dy == 0 && dz == 0 ? this : blockToBounds(new BlockPos(this.getX() + dx, this.getY() + dy, this.getZ() + dz));
+        return dx == 0 && dy == 0 && dz == 0 ? this : new BlockPosWrapped(this.getX() + dx, this.getY() + dy, this.getZ() + dz, this.transformer);
     }
 
     @Override
@@ -33,21 +37,21 @@ public class BlockPosWrapped extends BlockPos {
         if (scalar == 1) {
             return this;
         } else {
-            return scalar == 0 ? ZERO : blockToBounds(new BlockPos(this.getX() * scalar, this.getY() * scalar, this.getZ() * scalar));
+            return scalar == 0 ? ZERO : new BlockPosWrapped(this.getX() * scalar, this.getY() * scalar, this.getZ() * scalar, this.transformer);
         }
     }
 
     @Override
     public @NotNull BlockPos relative(Direction direction) {
-        return blockToBounds(new BlockPos(this.getX() + direction.getStepX(), this.getY() + direction.getStepY(), this.getZ() + direction.getStepZ()));
+        return new BlockPosWrapped(this.getX() + direction.getStepX(), this.getY() + direction.getStepY(), this.getZ() + direction.getStepZ(), this.transformer);
     }
 
     @Override
     public @NotNull BlockPos relative(Direction direction, int distance) {
         return distance == 0
                 ? this
-                : blockToBounds(new BlockPos(
-    this.getX() + direction.getStepX() * distance, this.getY() + direction.getStepY() * distance, this.getZ() + direction.getStepZ() * distance));
+                : new BlockPosWrapped(
+    this.getX() + direction.getStepX() * distance, this.getY() + direction.getStepY() * distance, this.getZ() + direction.getStepZ() * distance, this.transformer);
     }
 
     @Override
@@ -58,22 +62,24 @@ public class BlockPosWrapped extends BlockPos {
             int i = axis == Direction.Axis.X ? amount : 0;
             int j = axis == Direction.Axis.Y ? amount : 0;
             int k = axis == Direction.Axis.Z ? amount : 0;
-            return blockToBounds(new BlockPos(this.getX() + i, this.getY() + j, this.getZ() + k));
+            return new BlockPosWrapped(this.getX() + i, this.getY() + j, this.getZ() + k, this.transformer);
         }
     }
 
     @Override
     public @NotNull BlockPos cross(Vec3i vector) {
-        return blockToBounds(new BlockPos(
+        return new BlockPosWrapped(
                 this.getY() * vector.getZ() - this.getZ() * vector.getY(),
                 this.getZ() * vector.getX() - this.getX() * vector.getZ(),
-                this.getX() * vector.getY() - this.getY() * vector.getX()
-        ));
+                this.getX() * vector.getY() - this.getY() * vector.getX(),
+	            this.transformer
+        );
     }
 
     @Deprecated
     public static Stream<BlockPos> squareOutSouthEast(BlockPos pos, WorldTransformer transformer) {
-        return Stream.of(pos, blockToBounds(pos.south(), transformer), blockToBounds(pos.east(), transformer), blockToBounds(pos.south().east(), transformer));
+		BlockPosWrapped wrappedBlockPos = new BlockPosWrapped(pos, transformer);
+        return Stream.of(wrappedBlockPos, wrappedBlockPos.south(), wrappedBlockPos.east(), wrappedBlockPos.south().east());
     }
 
     public static class MutableBlockPosWrapped extends MutableBlockPos {
@@ -99,10 +105,6 @@ public class BlockPosWrapped extends BlockPos {
             super.setZ(z);
             return this;
         }
-    }
-
-    private BlockPos blockToBounds(BlockPos blockPos) {
-        return transformer.translateBlockToBounds(blockPos);
     }
 
     private static BlockPos blockToBounds(BlockPos blockPos, WorldTransformer transformer) {

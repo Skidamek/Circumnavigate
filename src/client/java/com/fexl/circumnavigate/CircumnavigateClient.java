@@ -23,11 +23,12 @@ public class CircumnavigateClient implements ClientModInitializer {
 			TransformersStorage.setTransformer(payload.levelKey(), payload.transformer());
 		})));
 
+		/**
 		ClientPlayNetworking.registerGlobalReceiver(ChunkLoadingLevelsPayload.TYPE, (((payload, context) -> {
 			HashMap<ChunkPos, Integer> newLevels = payload.getLevels();
 			for(ChunkPos serverPos : newLevels.keySet()) {
 				chunkLoadingLevels.put(serverPos, newLevels.get(serverPos));
 			}
-		})));
+		})));**/
 	}
 }

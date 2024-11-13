@@ -17,6 +17,6 @@ public class ChunkHolderMixin {
 
 	@Inject(method = "setTicketLevel", at = @At("HEAD"))
 	public void setTicketLevel(int level, CallbackInfo ci) {
-		DebugInfo.chunkLoadingLevels.put(thiz.getPos(), level);
+		//DebugInfo.chunkLoadingLevels.put(thiz.getPos(), level);
 	}
 }

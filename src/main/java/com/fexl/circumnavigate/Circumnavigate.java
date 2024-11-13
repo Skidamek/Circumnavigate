@@ -24,8 +24,9 @@ public class Circumnavigate implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		PayloadTypeRegistry.configurationS2C().register(LevelWrappingPayload.TYPE, LevelWrappingPayload.STREAM_CODEC);
-		PayloadTypeRegistry.playS2C().register(ChunkLoadingLevelsPayload.TYPE, ChunkLoadingLevelsPayload.STREAM_CODEC);
+		//PayloadTypeRegistry.playS2C().register(ChunkLoadingLevelsPayload.TYPE, ChunkLoadingLevelsPayload.STREAM_CODEC);
 
+		/**
 		ServerTickEvents.END_SERVER_TICK.register((server -> {
 			if (tickCount++ >= 10) {
 				server.getAllLevels().forEach((serverLevel -> {
@@ -38,6 +39,6 @@ public class Circumnavigate implements ModInitializer {
 
 //				LOGGER.info("Sent chunk loading levels to all players");
 			}
-		}));
+		}));**/
 	}
 }

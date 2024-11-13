@@ -12,23 +12,25 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(SignalGetter.class)
-public class SignalGetterMixin {
-	SignalGetter thiz = (SignalGetter) (Object) this;
+public interface SignalGetterMixin {
 
 	@ModifyVariable(method = "getControlInputSignal", at = @At("HEAD"), index = 1, argsOnly = true)
-	public BlockPos modifyBlockPos(BlockPos blockPos) {
+	default BlockPos modifyBlockPos(BlockPos blockPos) {
+		SignalGetter thiz = (SignalGetter) (Object) this;
 		if(thiz.isClientSide()) return blockPos;
 		return new BlockPosWrapped(blockPos, thiz.getTransformer());
 	}
 
 	@ModifyVariable(method = "getSignal", at = @At("HEAD"), index = 1, argsOnly = true)
-	public BlockPos modifyBlockPos2(BlockPos blockPos) {
+	default BlockPos modifyBlockPos2(BlockPos blockPos) {
+		SignalGetter thiz = (SignalGetter) (Object) this;
 		if(thiz.isClientSide()) return blockPos;
 		return new BlockPosWrapped(blockPos, thiz.getTransformer());
 	}
 
 	@ModifyVariable(method = "hasNeighborSignal", at = @At("HEAD"), index = 1, argsOnly = true)
-	public BlockPos modifyBlockPos3(BlockPos blockPos) {
+	default BlockPos modifyBlockPos3(BlockPos blockPos) {
+		SignalGetter thiz = (SignalGetter) (Object) this;
 		if(thiz.isClientSide()) return blockPos;
 		return new BlockPosWrapped(blockPos, thiz.getTransformer());
 	}

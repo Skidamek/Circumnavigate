@@ -9,6 +9,7 @@
     "blockHandle.blocks.BaseRailBlockMixin",
     "blockHandle.blocks.RailBlockMixin",
     "blockHandle.blocks.RailStateMixin",
+    "blockHandle.blocks.SignalGetterMixin",
     "blockHandle.blocks.piston.PistonBaseBlockMixin",
     "blockHandle.blocks.piston.PistonHeadBlockMixin",
     "blockHandle.blocks.piston.PistonStructureResolverMixin",

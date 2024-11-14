@@ -28,26 +28,26 @@ public class BlockPosWrapped extends BlockPos {
     }
 
     @Override
-    public @NotNull BlockPos offset(int dx, int dy, int dz) {
+    public @NotNull BlockPosWrapped offset(int dx, int dy, int dz) {
         return dx == 0 && dy == 0 && dz == 0 ? this : new BlockPosWrapped(this.getX() + dx, this.getY() + dy, this.getZ() + dz, this.transformer);
     }
 
     @Override
-    public @NotNull BlockPos multiply(int scalar) {
+    public @NotNull BlockPosWrapped multiply(int scalar) {
         if (scalar == 1) {
             return this;
         } else {
-            return scalar == 0 ? ZERO : new BlockPosWrapped(this.getX() * scalar, this.getY() * scalar, this.getZ() * scalar, this.transformer);
+            return scalar == 0 ? (BlockPosWrapped) ZERO : new BlockPosWrapped(this.getX() * scalar, this.getY() * scalar, this.getZ() * scalar, this.transformer);
         }
     }
 
     @Override
-    public @NotNull BlockPos relative(Direction direction) {
+    public @NotNull BlockPosWrapped relative(Direction direction) {
         return new BlockPosWrapped(this.getX() + direction.getStepX(), this.getY() + direction.getStepY(), this.getZ() + direction.getStepZ(), this.transformer);
     }
 
     @Override
-    public @NotNull BlockPos relative(Direction direction, int distance) {
+    public @NotNull BlockPosWrapped relative(Direction direction, int distance) {
         return distance == 0
                 ? this
                 : new BlockPosWrapped(
@@ -55,7 +55,7 @@ public class BlockPosWrapped extends BlockPos {
     }
 
     @Override
-    public @NotNull BlockPos relative(Direction.Axis axis, int amount) {
+    public @NotNull BlockPosWrapped relative(Direction.Axis axis, int amount) {
         if (amount == 0) {
             return this;
         } else {
@@ -67,7 +67,7 @@ public class BlockPosWrapped extends BlockPos {
     }
 
     @Override
-    public @NotNull BlockPos cross(Vec3i vector) {
+    public @NotNull BlockPosWrapped cross(Vec3i vector) {
         return new BlockPosWrapped(
                 this.getY() * vector.getZ() - this.getZ() * vector.getY(),
                 this.getZ() * vector.getX() - this.getX() * vector.getZ(),
@@ -82,15 +82,12 @@ public class BlockPosWrapped extends BlockPos {
         return Stream.of(wrappedBlockPos, wrappedBlockPos.south(), wrappedBlockPos.east(), wrappedBlockPos.south().east());
     }
 
-    public static class MutableBlockPosWrapped extends MutableBlockPos {
-        final WorldTransformer transformer;
-
-        public MutableBlockPosWrapped(int x, int y, int z, WorldTransformer transformer) {
-            super(x, y, z);
-            this.transformer = transformer;
+    public static class MutableBlockPos extends BlockPosWrapped {
+        public MutableBlockPos(int x, int y, int z, WorldTransformer transformer) {
+            super(x, y, z, transformer);
         }
 
-        public MutableBlockPosWrapped(double x, double y, double z, WorldTransformer transformer) {
+        public MutableBlockPos(double x, double y, double z, WorldTransformer transformer) {
             this(Mth.floor(x), Mth.floor(y), Mth.floor(z), transformer);
         }
 
@@ -105,10 +102,6 @@ public class BlockPosWrapped extends BlockPos {
             super.setZ(z);
             return this;
         }
-    }
-
-    private static BlockPos blockToBounds(BlockPos blockPos, WorldTransformer transformer) {
-        return transformer.translateBlockToBounds(blockPos);
     }
 
 

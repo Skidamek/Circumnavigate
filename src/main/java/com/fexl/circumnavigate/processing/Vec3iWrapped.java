@@ -7,6 +7,7 @@ package com.fexl.circumnavigate.processing;
 import com.fexl.circumnavigate.core.WorldTransformer;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import org.jetbrains.annotations.NotNull;
 
 public class Vec3iWrapped extends Vec3i {
 	final WorldTransformer transformer;
@@ -17,38 +18,38 @@ public class Vec3iWrapped extends Vec3i {
 	}
 
 	@Override
-	protected Vec3i setX(int x) {
-		return this.setX(transformer.xTransformer.wrapCoordToLimit(x));
+	protected @NotNull Vec3iWrapped setX(int x) {
+		return (Vec3iWrapped) super.setX(transformer.xTransformer.wrapCoordToLimit(x));
 	}
 
 	@Override
-	protected Vec3i setZ(int z) {
-		return this.setZ(transformer.zTransformer.wrapCoordToLimit(z));
+	protected @NotNull Vec3iWrapped setZ(int z) {
+		return (Vec3iWrapped) super.setZ(transformer.zTransformer.wrapCoordToLimit(z));
 	}
 
 	@Override
-	public Vec3i offset(int dx, int dy, int dz) {
+	public @NotNull Vec3iWrapped offset(int dx, int dy, int dz) {
 		return dx == 0 && dy == 0 && dz == 0 ? this : new Vec3iWrapped(this.getX() + dx, this.getY() + dy, this.getZ() + dz, this.transformer);
 	}
 
 	@Override
-	public Vec3i multiply(int scalar) {
+	public @NotNull Vec3iWrapped multiply(int scalar) {
 		if (scalar == 1) {
 			return this;
 		} else {
-			return scalar == 0 ? ZERO : new Vec3iWrapped(this.getX() * scalar, this.getY() * scalar, this.getZ() * scalar, this.transformer);
+			return scalar == 0 ? (Vec3iWrapped) ZERO : new Vec3iWrapped(this.getX() * scalar, this.getY() * scalar, this.getZ() * scalar, this.transformer);
 		}
 	}
 
 	@Override
-	public Vec3i relative(Direction direction, int distance) {
+	public @NotNull Vec3iWrapped relative(Direction direction, int distance) {
 		return distance == 0
 			? this
 			: new Vec3iWrapped(this.getX() + direction.getStepX() * distance, this.getY() + direction.getStepY() * distance, this.getZ() + direction.getStepZ() * distance, this.transformer);
 	}
 
 	@Override
-	public Vec3i relative(Direction.Axis axis, int amount) {
+	public @NotNull Vec3iWrapped relative(Direction.Axis axis, int amount) {
 		if (amount == 0) {
 			return this;
 		} else {
@@ -60,7 +61,7 @@ public class Vec3iWrapped extends Vec3i {
 	}
 
 	@Override
-	public Vec3i cross(Vec3i vector) {
+	public @NotNull Vec3iWrapped cross(Vec3i vector) {
 		return new Vec3iWrapped(
 			this.getY() * vector.getZ() - this.getZ() * vector.getY(),
 			this.getZ() * vector.getX() - this.getX() * vector.getZ(),

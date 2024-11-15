@@ -16,10 +16,12 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(FishingHook.class)
 public abstract class FishingHookMixin {
+	FishingHook thiz = (FishingHook) (Object) this;
 
     // Fix knockback miscalculation
     @WrapOperation(method = "pullEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"))
-    public void wrapDelta(Entity instance, Vec3 deltaMovement, Operation<Void> original, @Local(name = "entity2") Entity owner) {
+    public void wrapDelta(Entity instance, Vec3 deltaMovement, Operation<Void> original) {
+		Entity owner = thiz.getOwner();
         WorldTransformer transformer = instance.level().getTransformer();
         double deltaX = transformer.xTransformer.getDeltaBetween(instance.getX(), owner.getX());
         double deltaY = owner.getY() - instance.getY(); // Cant use y directly from deltaMovement since its scaled by vanilla

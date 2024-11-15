@@ -8,6 +8,7 @@ import com.fexl.circumnavigate.core.WorldTransformer;
 import com.fexl.circumnavigate.storage.TransformerRequests;
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -41,12 +42,14 @@ public interface EntityGetterMixin {
 	default boolean wrapAABB(VoxelShape shape1, VoxelShape shape2, BooleanOp resultOperator, @Local(argsOnly = true) @Nullable Entity entity) {
 		EntityGetter thiz = (EntityGetter) (Object) this;
 
-		if(this instanceof Level level && level.isClientSide) return Shapes.joinIsNotEmpty(shape1, shape2, resultOperator);
+		if(this instanceof ServerLevel level) {
+			WorldTransformer transformer = level.getTransformer();
+			VoxelShape result = Shapes.create(transformer.translateAABBFromBounds(shape1.bounds(), shape2.bounds()));
 
-		WorldTransformer transformer = thiz.getTransformer();
-		VoxelShape result = Shapes.create(transformer.translateAABBFromBounds(shape1.bounds(), shape2.bounds()));
+			return Shapes.joinIsNotEmpty(shape1, result, resultOperator);
+		}
 
-		return Shapes.joinIsNotEmpty(shape1, result, resultOperator);
+		return Shapes.joinIsNotEmpty(shape1, shape2, resultOperator);
 	}
 
 	/**

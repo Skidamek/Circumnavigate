@@ -8,6 +8,7 @@ import com.fexl.circumnavigate.processing.Cursor3DWrapped;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Cursor3D;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.*;
@@ -34,14 +35,16 @@ public abstract class BlockCollisionsMixin<T> extends AbstractIterator<T> {
 		//TODO: this cannot be applied to a certain subset of precursor levels. These are the current exclusions, but more may be required.
 		if(!(collisionGetter instanceof Level) && !(collisionGetter instanceof PathNavigationRegion)) return;
 
-		int i = Mth.floor(box.minX - 1.0E-7) - 1;
-		int j = Mth.floor(box.maxX + 1.0E-7) + 1;
-		int k = Mth.floor(box.minY - 1.0E-7) - 1;
-		int l = Mth.floor(box.maxY + 1.0E-7) + 1;
-		int m = Mth.floor(box.minZ - 1.0E-7) - 1;
-		int n = Mth.floor(box.maxZ + 1.0E-7) + 1;
+		if(collisionGetter instanceof ServerLevel level) {
+			int i = Mth.floor(box.minX - 1.0E-7) - 1;
+			int j = Mth.floor(box.maxX + 1.0E-7) + 1;
+			int k = Mth.floor(box.minY - 1.0E-7) - 1;
+			int l = Mth.floor(box.maxY + 1.0E-7) + 1;
+			int m = Mth.floor(box.minZ - 1.0E-7) - 1;
+			int n = Mth.floor(box.maxZ + 1.0E-7) + 1;
 
-		this.cursor = new Cursor3DWrapped(i, k, m, j, l, n, collisionGetter.getTransformer());
+			this.cursor = new Cursor3DWrapped(i, k, m, j, l, n, level.getTransformer());
+		}
 
 
 	}

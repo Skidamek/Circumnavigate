@@ -20,6 +20,6 @@ public class NaturalSpawnerMixin {
 
 	@Inject(method = "spawnMobsForChunkGeneration", at = @At("HEAD"), cancellable = true)
 	private static void spawnMobsForChunkGeneration(ServerLevelAccessor levelAccessor, Holder<Biome> biome, ChunkPos chunkPos, RandomSource random, CallbackInfo ci) {
-		if (levelAccessor.getTransformer().isChunkOverBounds(chunkPos)) ci.cancel();
+		if (levelAccessor.getLevel().getTransformer().isChunkOverBounds(chunkPos)) ci.cancel();
 	}
 }

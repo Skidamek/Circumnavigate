@@ -42,7 +42,6 @@
     "interfaceInjects.PathNavigationRegionInjectorMixin",
     "interfaceInjects.PlayerClientInjectorMixin",
     "interfaceInjects.WorldGenRegionInjectorMixin",
-    "itemHandle.BlockItemMixin",
     "lightHandle.BlockLightEngineMixin",
     "lightHandle.LightEngineAccessor",
     "lightHandle.SkyLightEngineMixin",

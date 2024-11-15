@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.phys.AABB;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,6 +32,7 @@ public abstract class LevelMixin<T extends Entity> {
 	@Shadow protected abstract LevelEntityGetter<Entity> getEntities();
 	@Shadow public abstract ProfilerFiller getProfiler();
 
+	@Shadow @Final public boolean isClientSide;
 	Level thiz = (Level) (Object) this;
 
 	/**
@@ -79,6 +81,24 @@ public abstract class LevelMixin<T extends Entity> {
 	@ModifyVariable(method = "getFluidState", at = @At("HEAD"), argsOnly = true, index = 1)
 	public BlockPos wrapFluidState(BlockPos blockPos) {
 		return wrapBlockPos(blockPos);
+	}
+
+	@ModifyVariable(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("HEAD"), argsOnly = true, index = 1)
+	public BlockPos modifyBlockPos2(BlockPos blockPos) {
+		if(thiz.isClientSide) return blockPos;
+		return thiz.getTransformer().translateBlockToBounds(blockPos);
+	}
+
+	@ModifyVariable(method = "removeBlock", at = @At("HEAD"), argsOnly = true, index = 1)
+	public BlockPos modifyBlockPos3(BlockPos blockPos) {
+		if(thiz.isClientSide) return blockPos;
+		return thiz.getTransformer().translateBlockToBounds(blockPos);
+	}
+
+	@ModifyVariable(method = "destroyBlock", at = @At("HEAD"), argsOnly = true, index = 1)
+	public BlockPos modifyBlockPos4(BlockPos blockPos) {
+		if(thiz.isClientSide) return blockPos;
+		return thiz.getTransformer().translateBlockToBounds(blockPos);
 	}
 
 	/**

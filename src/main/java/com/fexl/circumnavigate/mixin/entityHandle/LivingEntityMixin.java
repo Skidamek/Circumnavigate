@@ -21,8 +21,9 @@ public abstract class LivingEntityMixin {
     @Unique private double deltaZ;
 
     @Inject(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;knockback(DDD)V"))
-    public void wrapDelta(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir, @Local(name = "entity2") Entity enemy) {
+    public void wrapDelta(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         Entity thiz = (Entity) (Object) this;
+        Entity enemy = source.getEntity();
         WorldTransformer transformer = enemy.level().getTransformer();
         deltaX = transformer.xTransformer.getDeltaBetween(thiz.getX(), enemy.getX());
         deltaZ = transformer.zTransformer.getDeltaBetween(thiz.getZ(), enemy.getZ());

@@ -12,19 +12,24 @@ public class CoordinateTransformers {
 	private final int lowerChunkBounds;
 	private final int upperChunkBounds;
 
+	private final int coordDomainLength;
+	private final int chunkDomainLength;
+
 	private final int chunkWidth = LevelChunkSection.SECTION_WIDTH;
 
 	public CoordinateTransformers(int lowerChunkBounds, int upperChunkBounds) {
 		this.lowerChunkBounds = lowerChunkBounds;
 		this.upperChunkBounds = upperChunkBounds;
+
+		this.coordDomainLength = upperChunkBounds * chunkWidth - lowerChunkBounds * chunkWidth;
+		this.chunkDomainLength = upperChunkBounds - lowerChunkBounds;
 	}
 
 	/**
 	 * For bounds equidistant from (0)
 	 */
 	public CoordinateTransformers(int chunkBounds) {
-		this.lowerChunkBounds = -chunkBounds;
-		this.upperChunkBounds = chunkBounds;
+		this(-chunkBounds, chunkBounds);
 	}
 
 	/**
@@ -32,8 +37,18 @@ public class CoordinateTransformers {
 	 * These bounds are inclusively defined as [lowerChunkBounds * chunkWidth, upperChunkBounds * chunkWidth]
 	 */
 	public double wrapCoordToLimit(double coord) {
-		double domainLength = upperChunkBounds * chunkWidth - lowerChunkBounds * chunkWidth;
-		return lowerChunkBounds * chunkWidth + ((coord - lowerChunkBounds * chunkWidth) % domainLength + domainLength) % domainLength;
+		//Short-circuit
+		if(!isCoordOverLimit(coord)) return coord;
+
+		double domainStart = lowerChunkBounds * chunkWidth;
+		double wrappedCoord = (coord - domainStart) % coordDomainLength;
+
+		// If wrappedCoord is negative, adjust it by adding coordDomainLength
+		if (wrappedCoord < 0) {
+			wrappedCoord += coordDomainLength;
+		}
+
+		return domainStart + wrappedCoord;
 	}
 
 	public int wrapCoordToLimit(int coord) {
@@ -66,8 +81,18 @@ public class CoordinateTransformers {
 	 * Output: 4
 	 */
 	public int wrapChunkToLimit(int chunkCoord) {
-		int domainLength = upperChunkBounds - lowerChunkBounds;
-		return lowerChunkBounds + ((chunkCoord - lowerChunkBounds) % domainLength + domainLength) % domainLength;
+		//Short-circuit
+		if(!isChunkOverLimit(chunkCoord)) return chunkCoord;
+
+		int offset = chunkCoord - lowerChunkBounds;
+		int wrappedCoord = offset % chunkDomainLength;
+
+		// If wrappedCoord is negative, adjust it by adding chunkDomainLength
+		if (wrappedCoord < 0) {
+			wrappedCoord += chunkDomainLength;
+		}
+
+		return lowerChunkBounds + wrappedCoord;
 	}
 
 	/**
@@ -77,7 +102,6 @@ public class CoordinateTransformers {
 	 * @return The wrappedCoord converted to extend past the bounds of the graph, its extension-direction determined by refCoord.
 	 */
 	public double unwrapCoordFromLimit(double refCoord, double wrappedCoord) {
-		double domainLength = upperChunkBounds * chunkWidth - lowerChunkBounds * chunkWidth;
 		double wrappedRefCoord = wrapCoordToLimit(refCoord);
 
 		double diff = wrappedCoord - wrappedRefCoord;
@@ -85,11 +109,11 @@ public class CoordinateTransformers {
 		double unwrappedCoord = refCoord + diff;
 
 		// Adjust to ensure the unwrapped coordinate is correct
-		while (unwrappedCoord < refCoord - domainLength / 2) {
-			unwrappedCoord += domainLength;
+		if (unwrappedCoord < refCoord - coordDomainLength / 2) {
+			unwrappedCoord += coordDomainLength;
 		}
-		while (unwrappedCoord > refCoord + domainLength / 2) {
-			unwrappedCoord -= domainLength;
+		if (unwrappedCoord > refCoord + coordDomainLength / 2) {
+			unwrappedCoord -= coordDomainLength;
 		}
 
 		return unwrappedCoord;
@@ -100,9 +124,6 @@ public class CoordinateTransformers {
 	}
 
 	public int unwrapChunkFromLimit(int refChunkCoord, int wrappedChunkCoord) {
-		//Get the width of the bounds
-		int domainLength = upperChunkBounds - lowerChunkBounds;
-
 		//Wrap the reference position
 		int wrappedRefCoord = wrapChunkToLimit(refChunkCoord);
 
@@ -113,11 +134,11 @@ public class CoordinateTransformers {
 		int unwrappedCoord = refChunkCoord + diff;
 
 		 // Adjust to ensure the unwrapped chunk coordinate is correct
-		 if (unwrappedCoord < refChunkCoord - domainLength / 2) {
-		    unwrappedCoord += domainLength;
+		 if (unwrappedCoord < refChunkCoord - chunkDomainLength / 2) {
+		    unwrappedCoord += chunkDomainLength;
 		 }
-		 else if (unwrappedCoord > refChunkCoord + domainLength / 2) {
-		    unwrappedCoord -= domainLength;
+		 else if (unwrappedCoord > refChunkCoord + chunkDomainLength / 2) {
+		    unwrappedCoord -= chunkDomainLength;
 		 }
 		return unwrappedCoord;
 	}

@@ -46,10 +46,4 @@ public abstract class ChunkMapMixin {
 		double e = SectionPos.sectionToBlockCoord(chunkPos.z, 8);
 		cir.setReturnValue(entity.level().getTransformer().distanceToSqrWrapped(entity.getX(), 0, entity.getY(), d, 0, e));
 	}
-
-	//TODO Fix properly to solve #24
-	@Inject(method = "hasWork", at = @At("HEAD"))
-	public void hasWork(CallbackInfoReturnable<Boolean> cir) {
-		TransformerRequests.hasWork = true;
-	}
 }

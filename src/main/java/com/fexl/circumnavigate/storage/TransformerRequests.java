@@ -10,5 +10,4 @@ import net.minecraft.server.level.ServerLevel;
 public class TransformerRequests {
 	public static ServerLevel chunkMapLevel;
 	public static ServerLevel chunkCacheLevel;
-	public static boolean hasWork = false;
 }

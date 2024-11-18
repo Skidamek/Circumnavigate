@@ -10,10 +10,13 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.level.ChunkTracker;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.lighting.DynamicGraphMinFixedPoint;
+import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@Debug(export = true)
 @Mixin(ChunkTracker.class)
 public abstract class ChunkTrackerMixin extends DynamicGraphMinFixedPoint {
 
@@ -22,33 +25,36 @@ public abstract class ChunkTrackerMixin extends DynamicGraphMinFixedPoint {
 	}
 
 	@Shadow protected abstract int computeLevelFromNeighbor(long startPos, long endPos, int startLevel);
+	@Shadow protected abstract int getLevelFromSource(long pos);
 
 	/**
-	 * Modifies ChunkPos to use wrapped chunks. This is essentially what fixes #10.
+	 * Modifies ChunkPos to use wrapped chunks.
 	 */
+	//TODO Fix properly to solve #24
 	@WrapOperation(method = "getComputedLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ChunkTracker;computeLevelFromNeighbor(JJI)I"))
 	private int getComputedLevel(ChunkTracker instance, long startPos, long endPos, int startLevel, Operation<Integer> original, @Local(argsOnly = true, ordinal = 1) long excludedSourcePos) {
+		if(TransformerRequests.hasWork) return original.call(instance, startPos, endPos, startLevel);
+
 		int originalRet = original.call(instance, startPos, endPos, startLevel);
 
-		WorldTransformer transformer = TransformerRequests.chunkCacheLevel.getTransformer();
+	    WorldTransformer transformer = TransformerRequests.chunkCacheLevel.getTransformer();
 
-		ChunkPos chunkPos = new ChunkPos(startPos);
-		ChunkPos wrappedChunkPos = transformer.translateChunkToBounds(chunkPos);
-		long wrappedPos = wrappedChunkPos.toLong();
+	    ChunkPos chunkPos = new ChunkPos(startPos);
+	    ChunkPos wrappedChunkPos = transformer.translateChunkToBounds(chunkPos);
+	    long wrappedPos = wrappedChunkPos.toLong();
+	    if (wrappedPos == endPos) {
+	        wrappedPos = ChunkPos.INVALID_CHUNK_POS;
+	    }
 
-		if (wrappedPos == endPos) {
-			wrappedPos = ChunkPos.INVALID_CHUNK_POS;
-		}
-
-		if (wrappedPos != excludedSourcePos) {
+	    if (wrappedPos != excludedSourcePos) {
 			int wrappedRet = this.computeLevelFromNeighbor(wrappedPos, endPos, getLevel(wrappedPos));
 
-			// return the lower of the two levels
-			return Math.min(originalRet, wrappedRet);
+	        // return the lower of the two levels
+	        return Math.min(originalRet, wrappedRet);
 		}
 
-		return originalRet;
-    }
+	    return originalRet;
+	}
 
 	/**
 	 * Updates loading levels of adjacent chunks so they are ready when needed. Modified to include wrapped chunks.

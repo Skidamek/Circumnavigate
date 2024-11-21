@@ -28,7 +28,7 @@
     "chunkHandle.generation.NoiseBasedChunkGeneratorMixin",
     "chunkHandle.generation.WorldGenContextMixin",
     "debug.ChunkHolderMixin",
-    "debug.ChunkStepMixin",
+    "debug.ChunkStatusTasksMixin",
     "entityHandle.EntityMixin",
     "entityHandle.LivingEntityMixin",
     "entityHandle.PlayerMixin",

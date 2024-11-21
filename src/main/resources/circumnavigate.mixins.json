@@ -51,6 +51,8 @@
     "packetHandle.ServerGamePacketListenerImplMixin",
     "packetHandle.ServerGamePacketListenerImplMixin_1",
     "packetHandle.packets.ClientboundLevelChunkWithLightPacketMixin",
+    "worldgen.ImprovedNoiseMixin",
+    "worldgen.SimplexNoiseMixin",
     "worldInit.PathNavigationRegionMixin",
     "worldInit.PlayerListMixin",
     "worldInit.PrimaryLevelDataMixin",

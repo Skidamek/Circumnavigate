@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.layouts.*;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -63,6 +64,16 @@ public class WrappingSettingsScreen extends Screen {
 		axis = rowHelper.addChild(CycleButton.builder(WrappingSettings.Axis::getText).withValues(WrappingSettings.Axis.X, WrappingSettings.Axis.Z).withInitialValue(WrappingSettings.Axis.X).displayOnlyValue().create(0,0,50,20,Component.literal("Shifted Axis")), new LayoutSettings.LayoutSettingsImpl().alignHorizontallyCenter());
 		rowHelper.addChild(new StringWidget(Component.literal("Shift Amount"), this.font), new LayoutSettings.LayoutSettingsImpl().alignHorizontallyLeft().alignVerticallyMiddle());
 		axisShift = rowHelper.addChild(new EditBox(WrappingSettingsScreen.this.font, 50, 20, (Component)Component.literal((String)"Shift Amount")));
+
+		//Temporary button to add a test world of diameter (-16, 16)
+		rowHelper.addChild(Button.builder(Component.literal("Test world (-16,16)"), button -> {
+			xMin.setValue("-16");
+			xMax.setValue("16");
+			zMin.setValue("-16");
+			zMax.setValue("16");
+			this.button.setValue(checkAndOperate());
+			WrappingSettingsScreen.this.minecraft.setScreen(lastScreen);
+		}).build());
 
 		rowHelper.getGrid().visitWidgets(this::addRenderableWidget);
 		rowHelper.getGrid().setPosition(this.width / 2 - 155, 12);

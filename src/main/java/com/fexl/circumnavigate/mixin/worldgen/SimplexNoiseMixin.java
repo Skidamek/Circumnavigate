@@ -6,38 +6,62 @@ package com.fexl.circumnavigate.mixin.worldgen;
 
 import com.fexl.circumnavigate.processing.worldgen.OpenSimplex2S;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(SimplexNoise.class)
 public abstract class SimplexNoiseMixin {
-	private final int randomSource = new WorldgenRandom(new LegacyRandomSource(597640159)).nextInt();
-	private int xWidth = 16;
-	private int zWidth = 16;
+	@Final @Shadow public double xo;
+	@Final @Shadow public double yo;
+	@Final @Shadow public double zo;
+	@Final @Shadow private int[] p;
+	@Final @Shadow private static double SQRT_3;
+	@Final @Shadow private static double F2;
+	@Final @Shadow private static double G2;
+	@Final @Shadow abstract public int p(int index);
+	@Final @Shadow abstract public double getCornerNoise3D(int gradientIndex, double x, double y, double z, double offset);
 
+	private int xWidth = 256;
+	private int zWidth = 256;
+
+	/**
 	public double getValue(double x, double y) {
-		double xa = x / xWidth;
-		double za = y / zWidth;
+		int i = Mth.floor(x);
+		int j = Mth.floor(y);
+		int xa = i / xWidth;
+		int za = j / zWidth;
 
 		double rxa = xa * 2 * Math.PI;
 		double rza = za * 2 * Math.PI;
 
-		return OpenSimplex2S.noise4_Fallback(randomSource, Math.sin(rxa), Math.cos(rxa), Math.sin(rza), Math.cos(rza));
+		return OpenSimplex2S.noise4_Fallback((long) (xo + yo + zo), Math.sin(rxa), Math.cos(rxa), Math.sin(rza), Math.cos(rza));
+	}**/
+
+
+
+	/**
+	public double getValue(double x, double y, double z) {
+		int i = Mth.floor(x);
+		int j = Mth.floor(z);
+		int xa = i / xWidth;
+		int za = j / zWidth;
+
+		double rxa = xa * 2 * Math.PI;
+		double rza = za * 2 * Math.PI;
+
+		return OpenSimplex2S.noise4_Fallback((long) (xo + yo + zo), Math.sin(rxa), Math.cos(rxa), Math.sin(rza), Math.cos(rza));
+	}**/
+
+	/**
+	public double getValue(double x, double y) {
+		return 70 * OpenSimplex2S.noise2((long) (xo + yo + zo), x, y);
 	}
 
 	public double getValue(double x, double y, double z) {
-		double xa = x / xWidth;
-		double za = z / zWidth;
-
-		double rxa = xa * 2 * Math.PI;
-		double rza = za * 2 * Math.PI;
-
-		return OpenSimplex2S.noise4_Fallback(randomSource, Math.sin(rxa), Math.cos(rxa), Math.sin(rza), Math.cos(rza))+y;
-	}
+		return 32 * OpenSimplex2S.noise3_Fallback((long) (xo + yo + zo), x, y, z);
+	}**/
 }

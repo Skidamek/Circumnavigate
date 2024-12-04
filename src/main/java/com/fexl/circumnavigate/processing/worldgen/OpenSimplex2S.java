@@ -215,7 +215,7 @@ public class OpenSimplex2S {
      * If Z is vertical in world coordinates, call noise3_ImproveXZ(x, Z, y) or use noise3_ImproveXY.
      * For a time varied animation, call noise3_ImproveXZ(x, T, y) or use noise3_ImproveXY.
      */
-    public static float noise3_ImproveXZ(long seed, double x, double y, double z) {
+    public static double noise3_ImproveXZ(long seed, double x, double y, double z) {
 
         // Re-orient the cubic lattices without skewing, so Y points up the main lattice diagonal,
         // and the planes formed by XZ are moved far out of alignment with the cube faces.

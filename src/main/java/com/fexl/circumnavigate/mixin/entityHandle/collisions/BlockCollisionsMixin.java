@@ -4,48 +4,61 @@
 
 package com.fexl.circumnavigate.mixin.entityHandle.collisions;
 
-import com.fexl.circumnavigate.processing.Cursor3DWrapped;
+import com.fexl.circumnavigate.core.WorldTransformer;
 import com.google.common.collect.AbstractIterator;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Cursor3D;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.BiFunction;
 
 @Mixin(BlockCollisions.class)
 public abstract class BlockCollisionsMixin<T> extends AbstractIterator<T> {
-	@Mutable @Final @Shadow private Cursor3D cursor;
+	@Unique
+	ServerLevel serverLevel;
 
 	/**
-	 * Wraps block collisions.
+	 * Provides the serverLevel, if it exists.
 	 */
 	@Inject(method = "<init>", at = @At("RETURN"))
 	private void wrap3DCursor(CollisionGetter collisionGetter, Entity entity, AABB box, boolean onlySuffocatingBlocks, BiFunction<BlockPos.MutableBlockPos, VoxelShape, T> resultProvider, CallbackInfo ci) {
-		if(collisionGetter instanceof Level level && level.isClientSide) return;
+		serverLevel = null;
+		if(collisionGetter instanceof ServerLevel level) serverLevel = level;
+	}
 
-		//TODO: this cannot be applied to a certain subset of precursor levels. These are the current exclusions, but more may be required.
-		if(!(collisionGetter instanceof Level) && !(collisionGetter instanceof PathNavigationRegion)) return;
+	/**
+	 * Wraps thee BlockCollisions.getChunk() method.
+	 */
+	@WrapOperation(method = "computeNext", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/BlockCollisions;getChunk(II)Lnet/minecraft/world/level/BlockGetter;"))
+	public BlockGetter getChunk(BlockCollisions<?> instance, int x, int z, Operation<BlockGetter> original) {
+		if(serverLevel == null) return original.call(instance, x, z);
+		WorldTransformer transformer = serverLevel.getTransformer();
+		return original.call(instance, transformer.xTransformer.wrapCoordToLimit(x), transformer.zTransformer.wrapCoordToLimit(z));
+	}
 
-		if(collisionGetter instanceof ServerLevel level) {
-			int i = Mth.floor(box.minX - 1.0E-7) - 1;
-			int j = Mth.floor(box.maxX + 1.0E-7) + 1;
-			int k = Mth.floor(box.minY - 1.0E-7) - 1;
-			int l = Mth.floor(box.maxY + 1.0E-7) + 1;
-			int m = Mth.floor(box.minZ - 1.0E-7) - 1;
-			int n = Mth.floor(box.maxZ + 1.0E-7) + 1;
-
-			this.cursor = new Cursor3DWrapped(i, k, m, j, l, n, level.getTransformer());
-		}
-
-
+	/**
+	 * Wraps the MutableBlockPos.set() method.
+	 */
+	@WrapOperation(method = "computeNext", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos$MutableBlockPos;set(III)Lnet/minecraft/core/BlockPos$MutableBlockPos;"))
+	public BlockPos.MutableBlockPos setPos(BlockPos.MutableBlockPos instance, int x, int y, int z, Operation<BlockPos.MutableBlockPos> original) {
+		if(serverLevel == null) return original.call(instance, x, y, z);
+		WorldTransformer transformer = serverLevel.getTransformer();
+		return original.call(instance, transformer.xTransformer.wrapCoordToLimit(x), y, transformer.zTransformer.wrapCoordToLimit(z));
 	}
 }

@@ -80,3 +80,7 @@ accessible field net/minecraft/server/level/ChunkMap$TrackedEntity entity Lnet/m
 accessible class net/minecraft/server/level/ChunkMap$DistanceManager
 accessible method net/minecraft/server/level/DistanceManager removePlayer (Lnet/minecraft/core/SectionPos;Lnet/minecraft/server/level/ServerPlayer;)V
 accessible method net/minecraft/server/level/DistanceManager addPlayer (Lnet/minecraft/core/SectionPos;Lnet/minecraft/server/level/ServerPlayer;)V
+
+accessible class net/minecraft/server/level/DistanceManager$ChunkTicketTracker
+
+accessible field net/minecraft/world/level/chunk/storage/SectionStorage levelHeightAccessor Lnet/minecraft/world/level/LevelHeightAccessor;

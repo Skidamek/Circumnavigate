@@ -2,6 +2,7 @@
 
 package com.fexl.circumnavigate.mixin.chunkHandle;
 
+import com.fexl.circumnavigate.accessors.TransformerAccessor;
 import com.fexl.circumnavigate.core.WorldTransformer;
 import com.fexl.circumnavigate.storage.TransformerRequests;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -16,9 +17,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Debug(export = true)
+//Transformer is available after the initializer
 @Mixin(ChunkTracker.class)
 public abstract class ChunkTrackerMixin extends DynamicGraphMinFixedPoint {
+	ChunkTracker thiz = (ChunkTracker) (Object) this;
 
 	protected ChunkTrackerMixin(int firstQueuedLevel, int width, int height) {
 		super(firstQueuedLevel, width, height);
@@ -30,11 +32,12 @@ public abstract class ChunkTrackerMixin extends DynamicGraphMinFixedPoint {
 	/**
 	 * Modifies ChunkPos to use wrapped chunks. This is essentially what fixes #10.
 	 */
+
 	@WrapOperation(method = "getComputedLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ChunkTracker;computeLevelFromNeighbor(JJI)I"))
 	private int getComputedLevel(ChunkTracker instance, long startPos, long endPos, int startLevel, Operation<Integer> original, @Local(argsOnly = true, ordinal = 1) long excludedSourcePos) {
 		int originalRet = original.call(instance, startPos, endPos, startLevel);
 
-	    WorldTransformer transformer = TransformerRequests.chunkCacheLevel.getTransformer();
+	    WorldTransformer transformer = thiz.getTransformer();
 
 	    ChunkPos chunkPos = new ChunkPos(startPos);
 	    ChunkPos wrappedChunkPos = transformer.translateChunkToBounds(chunkPos);
@@ -58,14 +61,13 @@ public abstract class ChunkTrackerMixin extends DynamicGraphMinFixedPoint {
 	 */
 	@WrapOperation(method = "checkNeighborsAfterUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ChunkPos;asLong(II)J"))
 	private long wrapChunkPos(int x, int z, Operation<Long> original, @Local(argsOnly = true) long pos, @Local(argsOnly = true) int level, @Local(argsOnly = true) boolean isDecreasing) {
-		WorldTransformer transformer = TransformerRequests.chunkCacheLevel.getTransformer();
+		WorldTransformer transformer = thiz.getTransformer();
 
 		int wrappedX = transformer.xTransformer.wrapChunkToLimit(x);
 		int wrappedZ = transformer.zTransformer.wrapChunkToLimit(z);
 		long chunkLong = original.call(wrappedX, wrappedZ);
 
 		if (chunkLong != pos) {
-			ChunkTracker thiz = (ChunkTracker) (Object) this;
 			thiz.checkNeighbor(pos, chunkLong, level, isDecreasing);
 		}
 

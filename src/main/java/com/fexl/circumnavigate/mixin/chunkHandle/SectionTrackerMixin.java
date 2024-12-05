@@ -2,6 +2,7 @@
 
 package com.fexl.circumnavigate.mixin.chunkHandle;
 
+import com.fexl.circumnavigate.accessors.TransformerAccessor;
 import com.fexl.circumnavigate.storage.TransformerRequests;
 import com.fexl.circumnavigate.core.WorldTransformer;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -11,15 +12,17 @@ import net.minecraft.server.level.SectionTracker;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+//Transformer is available after the initializer
 @Mixin(SectionTracker.class)
-public class SectionTrackerMixin {
+public class SectionTrackerMixin implements TransformerAccessor {
+	SectionTracker thiz = (SectionTracker) (Object) this;
 
 	/**
 	 * Updates loading levels of adjacent chunk sections so they are ready when needed. Modified to include wrapped sections.
 	 */
 	@WrapOperation(method = "checkNeighborsAfterUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/SectionPos;offset(JIII)J"))
 	private long wrapChunkPos(long pos, int x, int y, int z, Operation<Long> original, @Local(argsOnly = true) int level, @Local(argsOnly = true) boolean isDecreasing) {
-		WorldTransformer transformer = TransformerRequests.chunkMapLevel.getTransformer();
+		WorldTransformer transformer = getTransformer();
 
 		int wrappedX = transformer.xTransformer.wrapChunkToLimit(x);
 		int wrappedZ = transformer.zTransformer.wrapChunkToLimit(z);
@@ -31,5 +34,17 @@ public class SectionTrackerMixin {
 		}
 
 		return original.call(pos, x, y, z);
+	}
+
+	WorldTransformer transformer;
+
+	@Override
+	public WorldTransformer getTransformer() {
+		return this.transformer;
+	}
+
+	@Override
+	public void setTransformer(WorldTransformer transformer) {
+		this.transformer = transformer;
 	}
 }

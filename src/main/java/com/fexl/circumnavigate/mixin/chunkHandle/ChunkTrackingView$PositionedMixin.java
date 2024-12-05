@@ -2,7 +2,7 @@
 
 package com.fexl.circumnavigate.mixin.chunkHandle;
 
-import com.fexl.circumnavigate.storage.TransformerRequests;
+import com.fexl.circumnavigate.accessors.TransformerAccessor;
 import com.fexl.circumnavigate.core.WorldTransformer;
 import net.minecraft.server.level.ChunkTrackingView.Positioned;
 import net.minecraft.world.level.ChunkPos;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.function.Consumer;
 
 @Mixin(Positioned.class)
-public abstract class PositionedMixin {
+public abstract class ChunkTrackingView$PositionedMixin implements TransformerAccessor {
 
 	@Unique private Positioned thiz = (Positioned) (Object) this;
 	/**
@@ -25,7 +25,6 @@ public abstract class PositionedMixin {
 	@Inject(method = "forEach", at = @At("HEAD"), cancellable = true)
 	private void includeWrappedChunks(Consumer<ChunkPos> action, CallbackInfo ci) {
 		ci.cancel();
-		WorldTransformer transformer = TransformerRequests.chunkMapLevel.getTransformer();
 
 		for (int x = thiz.minX(); x <= thiz.maxX(); x++) {
 			for (int z = thiz.minZ(); z <= thiz.maxZ(); z++) {
@@ -47,7 +46,6 @@ public abstract class PositionedMixin {
 	protected void includeWrappedChunks(Positioned other, CallbackInfoReturnable<Boolean> cir) {
 		cir.cancel();
 
-		WorldTransformer transformer = TransformerRequests.chunkMapLevel.getTransformer();
 		boolean xIntersects = (thiz.minX() <= other.maxX() && thiz.maxX() >= other.minX()) ||
 			(thiz.minX() + transformer.xWidth <= other.maxX() && thiz.maxX() + transformer.xWidth >= other.minX()) ||
 			(thiz.minX() <= other.maxX() + transformer.xWidth && thiz.maxX() >= other.minX() + transformer.xWidth);
@@ -57,5 +55,17 @@ public abstract class PositionedMixin {
 			(thiz.minZ() <= other.maxZ() + transformer.zWidth && thiz.maxZ() >= other.minZ() + transformer.zWidth);
 
 		cir.setReturnValue(xIntersects && zIntersects);
+	}
+
+	WorldTransformer transformer;
+
+	@Override
+	public WorldTransformer getTransformer() {
+		return this.transformer;
+	}
+
+	@Override
+	public void setTransformer(WorldTransformer transformer) {
+		this.transformer = transformer;
 	}
 }

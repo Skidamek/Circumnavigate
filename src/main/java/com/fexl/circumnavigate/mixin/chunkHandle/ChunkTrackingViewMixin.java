@@ -2,7 +2,9 @@
 
 package com.fexl.circumnavigate.mixin.chunkHandle;
 
+import com.fexl.circumnavigate.accessors.TransformerAccessor;
 import com.fexl.circumnavigate.core.WorldTransformer;
+import com.fexl.circumnavigate.injected.LevelTransformerInjector;
 import com.fexl.circumnavigate.storage.TransformerRequests;
 import net.minecraft.server.level.ChunkTrackingView;
 import net.minecraft.world.level.ChunkPos;
@@ -15,12 +17,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.function.Consumer;
 
 @Mixin(ChunkTrackingView.class)
-public interface ChunkTrackingViewMixin extends ChunkTrackingView {
+public interface ChunkTrackingViewMixin {
 	/**
 	 * Checks if a chunk is within a distance. Modified to support wrapping.
 	 */
 	@Inject(method = "isWithinDistance", at = @At("HEAD"), cancellable = true)
 	private static void checkWrappedChunks(int centerX, int centerZ, int viewDistance, int x, int z, boolean serachAllChunks, CallbackInfoReturnable<Boolean> cir) {
+		//Because isWithinDistance is a static method, it requires an exterior transformer instance that can't be passed down.
 		WorldTransformer transformer = TransformerRequests.chunkMapLevel.getTransformer();
 
 		//Don't include chunks that extend past the bounds.
@@ -45,7 +48,6 @@ public interface ChunkTrackingViewMixin extends ChunkTrackingView {
 	@Inject(method = "difference", at = @At("HEAD"), cancellable = true)
 	private static void includeWrappedChunks(ChunkTrackingView oldChunkTrackingView, ChunkTrackingView newChunkTrackingView, Consumer<ChunkPos> chunkDropper, Consumer<ChunkPos> chunkMarker, CallbackInfo ci) {
 		ci.cancel();
-		WorldTransformer transformer = TransformerRequests.chunkMapLevel.getTransformer();
 
 		if (oldChunkTrackingView.equals(newChunkTrackingView)) return;
 
@@ -53,6 +55,8 @@ public interface ChunkTrackingViewMixin extends ChunkTrackingView {
 			&& newChunkTrackingView instanceof ChunkTrackingView.Positioned positioned2
 			&& ((PositionedAccessorMixin) (Object) positioned).squareIntersectsAM(positioned2))
 		{
+
+			WorldTransformer transformer = ((TransformerAccessor) (Object) positioned).getTransformer();
 
 			//This prevents mass calculation of unneeded chunks and keeps chunk bandwidth predictable when crossing borders
 			int i = Math.min(positioned.minX(), transformer.xTransformer.unwrapChunkFromLimit(positioned.minX(), positioned2.minX()));

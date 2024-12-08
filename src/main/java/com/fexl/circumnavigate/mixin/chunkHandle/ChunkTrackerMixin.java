@@ -9,6 +9,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.level.ChunkTracker;
+import net.minecraft.server.level.DistanceManager;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.lighting.DynamicGraphMinFixedPoint;
 import org.spongepowered.asm.mixin.Debug;
@@ -30,11 +31,13 @@ public abstract class ChunkTrackerMixin extends DynamicGraphMinFixedPoint {
 	@Shadow protected abstract int getLevelFromSource(long pos);
 
 	/**
-	 * Modifies ChunkPos to use wrapped chunks. This is essentially what fixes #10.
+	 * Modifies ChunkPos to use wrapped chunks
 	 */
-
 	@WrapOperation(method = "getComputedLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ChunkTracker;computeLevelFromNeighbor(JJI)I"))
 	private int getComputedLevel(ChunkTracker instance, long startPos, long endPos, int startLevel, Operation<Integer> original, @Local(argsOnly = true, ordinal = 1) long excludedSourcePos) {
+		//This class cannot use this transformation because it will not unload the chunks at save. However, the intended effect of these transformations still applies.
+		if(thiz instanceof DistanceManager.ChunkTicketTracker) return original.call(instance, startPos, endPos, startLevel);
+
 		int originalRet = original.call(instance, startPos, endPos, startLevel);
 
 	    WorldTransformer transformer = thiz.getTransformer();

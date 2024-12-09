@@ -4,29 +4,17 @@ package com.fexl.circumnavigate.mixin.chunkHandle;
 
 import com.fexl.circumnavigate.accessors.TransformerAccessor;
 import com.fexl.circumnavigate.core.WorldTransformer;
-import com.fexl.circumnavigate.injected.LevelTransformerInjector;
 import com.fexl.circumnavigate.storage.TransformerRequests;
-import com.mojang.datafixers.DataFixer;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.*;
-import net.minecraft.server.level.progress.ChunkProgressListener;
-import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.chunk.LightChunkGetter;
-import net.minecraft.world.level.entity.ChunkStatusUpdateListener;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
-import net.minecraft.world.level.storage.LevelStorageSource;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.concurrent.Executor;
-import java.util.function.Supplier;
 
 @Mixin(ChunkMap.class)
 public abstract class ChunkMapMixin {
@@ -66,6 +54,6 @@ public abstract class ChunkMapMixin {
     private static void wrapDistanceToSquare(ChunkPos chunkPos, Entity entity, CallbackInfoReturnable<Double> cir) {
 		double d = SectionPos.sectionToBlockCoord(chunkPos.x, 8);
 		double e = SectionPos.sectionToBlockCoord(chunkPos.z, 8);
-		cir.setReturnValue(entity.level().getTransformer().distanceToSqrWrapped(entity.getX(), 0, entity.getY(), d, 0, e));
+		cir.setReturnValue(entity.level().getTransformer().distanceToSqrWrappedCoord(entity.getX(), 0, entity.getY(), d, 0, e));
 	}
 }

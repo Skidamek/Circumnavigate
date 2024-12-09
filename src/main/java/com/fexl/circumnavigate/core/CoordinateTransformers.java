@@ -6,14 +6,14 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 
 /**
  * Transforms regular coordinates from and to wrapped coordinates.
- * Wrapped coordinates are limited by defined chunk bounds in all (x,z) directions.
+ * Wrapped coordinates are limited by defined chunk bounds.
  */
 public class CoordinateTransformers {
-	private final int lowerChunkBounds;
-	private final int upperChunkBounds;
+	public final int lowerChunkBounds;
+	public final int upperChunkBounds;
 
-	private final int coordDomainLength;
-	private final int chunkDomainLength;
+	public final int chunkDomainLength;
+	public final int coordDomainLength;
 
 	private final int chunkWidth = LevelChunkSection.SECTION_WIDTH;
 
@@ -21,8 +21,10 @@ public class CoordinateTransformers {
 		this.lowerChunkBounds = lowerChunkBounds;
 		this.upperChunkBounds = upperChunkBounds;
 
-		this.coordDomainLength = upperChunkBounds * chunkWidth - lowerChunkBounds * chunkWidth;
-		this.chunkDomainLength = upperChunkBounds - lowerChunkBounds;
+		this.chunkDomainLength = Math.abs(upperChunkBounds - lowerChunkBounds);
+		this.coordDomainLength = this.chunkDomainLength * chunkWidth;
+
+
 	}
 
 	/**
@@ -57,28 +59,7 @@ public class CoordinateTransformers {
 
 	/**
 	 * Wraps a chunk coordinate around the bounds of an axis.<br>
-	 * These bounds are inclusively defined as [lowerChunkBounds, upperChunkBounds]
-	 * <p>
-	 *     For instance, if <code>lowerChunkBounds = -8</code> and <code>upperChunkBounds = 8</code>, example inputs and outputs are as follows:<br>
-	 * @example
-	 * Input: -9
-	 * Output: 8
-	 *
-	 * @example
-	 * Input: 9
-	 * Output: -8
-	 *
-	 * @example
-	 * Input: -8
-	 * Output: -8
-	 *
-	 * @example
-	 * Input: 8
-	 * Output: 8
-	 *
-	 * @example
-	 * Input: 4
-	 * Output: 4
+	 * These bounds are inclusively defined as [lowerChunkBounds, upperChunkBounds - 1]
 	 */
 	public int wrapChunkToLimit(int chunkCoord) {
 		//Short-circuit
@@ -109,10 +90,10 @@ public class CoordinateTransformers {
 		double unwrappedCoord = refCoord + diff;
 
 		// Adjust to ensure the unwrapped coordinate is correct
-		if (unwrappedCoord < refCoord - coordDomainLength / 2) {
+		if (unwrappedCoord < refCoord - (double) coordDomainLength / 2) {
 			unwrappedCoord += coordDomainLength;
 		}
-		if (unwrappedCoord > refCoord + coordDomainLength / 2) {
+		if (unwrappedCoord > refCoord + (double) coordDomainLength / 2) {
 			unwrappedCoord -= coordDomainLength;
 		}
 
@@ -148,6 +129,28 @@ public class CoordinateTransformers {
 		double toCoordUnwrapped = unwrapCoordFromLimit(fromCoord, toCoord);
 
 		return toCoordUnwrapped - fromCoord;
+	}
+
+	public double wrapAndSqrCoord(double coord) {
+		if(coord > upperChunkBounds * chunkWidth) {
+			coord -= coordDomainLength;
+		}
+		else if (coord < lowerChunkBounds * chunkWidth) {
+			coord += coordDomainLength;
+		}
+
+		return coord * coord;
+	}
+
+	public int wrapAndSqrChunk(int chunkCoord) {
+		if(chunkCoord > upperChunkBounds) {
+			chunkCoord -= chunkDomainLength;
+		}
+		else if (chunkCoord < lowerChunkBounds) {
+			chunkCoord += chunkDomainLength;
+		}
+
+		return chunkCoord * chunkCoord;
 	}
 
 	public boolean isCoordOverLimit(double coord) {

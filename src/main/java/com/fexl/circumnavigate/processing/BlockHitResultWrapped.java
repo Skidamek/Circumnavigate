@@ -40,6 +40,6 @@ public class BlockHitResultWrapped extends BlockHitResult {
 
 	@Override
 	public double distanceTo(Entity entity) {
-		return this.transformer.distanceToSqrWrapped(entity.getX(), entity.getY(), entity.getZ(), this.location.x, this.location.y, this.location.z);
+		return this.transformer.distanceToSqrWrappedCoord(entity.getX(), entity.getY(), entity.getZ(), this.location.x, this.location.y, this.location.z);
 	}
 }

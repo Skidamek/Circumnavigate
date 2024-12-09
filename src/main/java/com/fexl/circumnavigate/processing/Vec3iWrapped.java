@@ -72,12 +72,12 @@ public class Vec3iWrapped extends Vec3i {
 
 	@Override
 	public double distToCenterSqr(double x, double y, double z) {
-		return transformer.distanceToSqrWrapped(x, y, z, this.getX() + 0.5, this.getY() + 0.5, this.getZ() + 0.5);
+		return transformer.distanceToSqrWrappedCoord(x, y, z, this.getX() + 0.5, this.getY() + 0.5, this.getZ() + 0.5);
 	}
 
 	@Override
 	public double distToLowCornerSqr(double x, double y, double z) {
-		return transformer.distanceToSqrWrapped(x, y, z, this.getX(), this.getY(), this.getZ());
+		return transformer.distanceToSqrWrappedCoord(x, y, z, this.getX(), this.getY(), this.getZ());
 	}
 
 	@Override

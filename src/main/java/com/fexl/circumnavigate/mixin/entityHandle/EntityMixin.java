@@ -39,13 +39,6 @@ public abstract class EntityMixin {
 	@ModifyVariable(method = "setPosRaw", at = @At("HEAD"), ordinal = 0, argsOnly = true)
 	public double wrapX(double x) {
 		if (level.isClientSide()) return x;
-
-		Entity thiz = (Entity)(Object)this;
-
-		if(thiz instanceof Player) {
-			return x;
-		}
-
 		return level.getTransformer().xTransformer.wrapCoordToLimit(x);
 	}
 
@@ -55,13 +48,6 @@ public abstract class EntityMixin {
 	@ModifyVariable(method = "setPosRaw", at = @At("HEAD"), ordinal = 2, argsOnly = true)
 	public double wrapZ(double z) {
 		if (level.isClientSide()) return z;
-
-		Entity thiz = (Entity)(Object)this;
-
-		if(thiz instanceof Player) {
-			return z;
-		}
-
 		return level.getTransformer().zTransformer.wrapCoordToLimit(z);
 	}
 
@@ -82,21 +68,21 @@ public abstract class EntityMixin {
 	public void wrapDistanceSquared1(Entity entity, CallbackInfoReturnable<Float> cir) {
 		if(level.isClientSide) return;
 		cir.cancel();
-		cir.setReturnValue(Mth.sqrt((float)level.getTransformer().distanceToSqrWrapped(entity.getX(), entity.getY(), entity.getZ(), thiz.getX(), thiz.getY(), thiz.getZ())));
+		cir.setReturnValue(Mth.sqrt((float)level.getTransformer().distanceToSqrWrappedCoord(entity.getX(), entity.getY(), entity.getZ(), thiz.getX(), thiz.getY(), thiz.getZ())));
 	}
 
 	@Inject(method = "distanceToSqr(DDD)D", at = @At("HEAD"), cancellable = true)
 	public void wrapDistanceSquared2(double x, double y, double z, CallbackInfoReturnable<Double> cir) {
 		if(level.isClientSide) return;
 		cir.cancel();
-		cir.setReturnValue(level.getTransformer().distanceToSqrWrapped(x, y, z, thiz.getX(), thiz.getY(), thiz.getZ()));
+		cir.setReturnValue(level.getTransformer().distanceToSqrWrappedCoord(x, y, z, thiz.getX(), thiz.getY(), thiz.getZ()));
 	}
 
 	@Inject(method = "distanceToSqr(Lnet/minecraft/world/phys/Vec3;)D", at = @At("HEAD"), cancellable = true)
 	public void wrapDistanceSquared3(Vec3 vec, CallbackInfoReturnable<Double> cir) {
 		if(level.isClientSide) return;
 		cir.cancel();
-		cir.setReturnValue(level.getTransformer().distanceToSqrWrapped(vec, new Vec3(thiz.getX(), thiz.getY(), thiz.getZ())));
+		cir.setReturnValue(level.getTransformer().distanceToSqrWrappedCoord(vec, new Vec3(thiz.getX(), thiz.getY(), thiz.getZ())));
 	}
 
 

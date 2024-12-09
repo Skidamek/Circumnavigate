@@ -5,7 +5,6 @@
 package com.fexl.circumnavigate.mixin.entityHandle.collisions;
 
 import com.fexl.circumnavigate.core.WorldTransformer;
-import com.fexl.circumnavigate.storage.TransformerRequests;
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.level.ServerLevel;
@@ -90,6 +89,6 @@ public interface EntityGetterMixin {
 		if(level.isClientSide) return entity.distanceToSqr(x, y, z);
 
 		WorldTransformer transformer = entity.level().getTransformer();
-		return transformer.distanceToSqrWrapped(entity.position(), new Vec3(x, y, z));
+		return transformer.distanceToSqrWrappedCoord(entity.position(), new Vec3(x, y, z));
 	}
 }

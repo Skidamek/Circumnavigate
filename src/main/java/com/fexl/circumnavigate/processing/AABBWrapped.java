@@ -17,6 +17,6 @@ public class AABBWrapped extends AABB {
 
 	@Override
 	public double distanceToSqr(Vec3 vec) {
-		return transformer.distanceToSqrWrapped(this, vec);
+		return transformer.distanceToSqrWrappedCoord(this, vec);
 	}
 }

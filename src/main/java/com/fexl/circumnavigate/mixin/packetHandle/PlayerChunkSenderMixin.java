@@ -13,7 +13,6 @@ import com.google.common.collect.Comparators;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.server.level.ChunkMap;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.PlayerChunkSender;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
@@ -33,7 +32,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 @SuppressWarnings({"unused", "unchecked", "deprecation"})
 @Mixin(PlayerChunkSender.class)
@@ -64,7 +62,7 @@ public class PlayerChunkSenderMixin {
 		List<LevelChunk> list;
 		if (!this.memoryConnection && this.pendingChunks.size() > i) {
 			//list = ((List)this.pendingChunks.stream().collect(Comparators.least(i, Comparator.comparingInt(chunkPos::distanceSquared))))
-			list = ((List)this.pendingChunks.stream().collect(Comparators.least(i, Comparator.comparingInt(compare -> transformer.distanceToSqrWrapped(chunkPos.toLong(), compare)))))
+			list = ((List)this.pendingChunks.stream().collect(Comparators.least(i, Comparator.comparingInt(compare -> transformer.distanceToSqrWrappedChunk(chunkPos.toLong(), compare)))))
 				.stream()
 				.mapToLong(longValue -> (long) longValue)
 				.mapToObj(chunkMap::getChunkToSend)
@@ -76,7 +74,7 @@ public class PlayerChunkSenderMixin {
 				.mapToObj(chunkMap::getChunkToSend)
 				.filter(Objects::nonNull)
 				//.sorted(Comparator.comparingInt(levelChunkx -> chunkPos.distanceSquared(levelChunkx.getPos())))
-				.sorted(Comparator.comparingInt(levelChunkx -> transformer.distanceToSqrWrapped(levelChunkx.getPos(), chunkPos)))
+				.sorted(Comparator.comparingInt(levelChunkx -> transformer.distanceToSqrWrappedChunk(levelChunkx.getPos(), chunkPos)))
 				.toList();
 		}
 

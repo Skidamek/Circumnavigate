@@ -99,8 +99,8 @@ public class WorldTransformer {
 		this.xShift = xShift;
 		this.zShift = zShift;
 
-		this.xWidth = Math.abs(this.xChunkBoundMin) + Math.abs(this.xChunkBoundMax);
-		this.zWidth = Math.abs(this.zChunkBoundMin) + Math.abs(this.zChunkBoundMax);
+		this.xWidth = xTransformer.chunkDomainLength;
+		this.zWidth = zTransformer.chunkDomainLength;
 
 		this.xBlockWidth = this.xWidth*chunkWidth - 1;
 		this.zBlockWidth = this.zWidth*chunkWidth - 1;
@@ -272,56 +272,57 @@ public class WorldTransformer {
 		return !(xChunkBoundMin == -invalidPos || xChunkBoundMax == invalidPos || zChunkBoundMin == -invalidPos || zChunkBoundMax == invalidPos);
 	}
 
-	public int distanceToSqrWrapped(long chunkPos1, long chunkPos2) {
-		return (int) distanceToSqrWrapped(ChunkPos.getX(chunkPos1), 0, ChunkPos.getZ(chunkPos1), ChunkPos.getX(chunkPos2), 0, ChunkPos.getZ(chunkPos2));
+	public int distanceToSqrWrappedChunk(long chunkPos1, long chunkPos2) {
+		return (int) distanceToSqrWrappedChunk(ChunkPos.getX(chunkPos1), ChunkPos.getZ(chunkPos1), ChunkPos.getX(chunkPos2), ChunkPos.getZ(chunkPos2));
 	}
 
-	public int distanceToSqrWrapped(ChunkPos chunkPos1, ChunkPos chunkPos2) {
-		return (int) distanceToSqrWrapped(chunkPos1.x, 0, chunkPos1.z, chunkPos2.x, 0, chunkPos2.z);
+	public int distanceToSqrWrappedChunk(ChunkPos chunkPos1, ChunkPos chunkPos2) {
+		return (int) distanceToSqrWrappedChunk(chunkPos1.x, chunkPos1.z, chunkPos2.x, chunkPos2.z);
 	}
 
-	public double distanceToSqrWrapped(Vec3 from, Vec3 to) {
+	public double distanceToSqrWrappedCoord(Vec3 from, Vec3 to) {
 		double d = to.x - from.x;
 		double e = to.y - from.y;
 		double f = to.z - from.z;
 
-		return wrapAndSqr(d, e, f);
+		return wrapAndSqrCoord(d, e, f);
 	}
 
-	public double distanceToSqrWrapped(double xFrom, double yFrom, double zFrom, double xTo, double yTo, double zTo) {
+	public double distanceToSqrWrappedCoord(double xFrom, double yFrom, double zFrom, double xTo, double yTo, double zTo) {
 		double d = xTo - xFrom;
 		double e = yTo - yFrom;
 		double f = zTo - zFrom;
 
-		return wrapAndSqr(d, e, f);
+		return wrapAndSqrCoord(d, e, f);
 	}
 
-	public double distanceToSqrWrapped(AABB aabb, Vec3 vec) {
+	public double distanceToSqrWrappedChunk(int xFrom, int zFrom, int xTo, int zTo) {
+		int returnX = xTo - xFrom;
+		int returnZ = zTo - zFrom;
+
+		return wrapAndSqrChunk(returnX, returnZ);
+	}
+
+	public double distanceToSqrWrappedCoord(AABB aabb, Vec3 vec) {
 		double d = Math.max(Math.max(aabb.minX - vec.x, vec.x - aabb.maxX), 0.0);
 		double e = Math.max(Math.max(aabb.minY - vec.y, vec.y - aabb.maxY), 0.0);
 		double f = Math.max(Math.max(aabb.minZ - vec.z, vec.z - aabb.maxZ), 0.0);
 
-		return wrapAndSqr(d, e, f);
+		return wrapAndSqrCoord(d, e, f);
 	}
 
-	private double wrapAndSqr(double x, double y, double z) {
-		int xWidthCoord = xWidth*chunkWidth;
-		int zWidthCoord = zWidth*chunkWidth;
+	private double wrapAndSqrCoord(double x, double y, double z) {
+		double returnX = xTransformer.wrapAndSqrCoord(x);
+		double returnZ = zTransformer.wrapAndSqrCoord(z);
 
-		// Adjust for wrapping on the x-axis
-		if (x > xChunkBoundMax) {
-			x -= xWidthCoord;
-		} else if (x < xChunkBoundMin) {
-			x += xWidthCoord;
-		}
+		return returnX + y * y + returnZ;
+	}
 
-		// Adjust for wrapping on the z-axis
-		if (z > zChunkBoundMax) {
-			z -= zWidthCoord;
-		} else if (z < zChunkBoundMin) {
-			z += zWidthCoord;
-		}
-		return x * x + y * y + z * z;
+	private int wrapAndSqrChunk(int x, int z) {
+		int returnX = xTransformer.wrapAndSqrChunk(x);
+		int returnZ = zTransformer.wrapAndSqrChunk(z);
+
+		return returnX + returnZ;
 	}
 
 	/**

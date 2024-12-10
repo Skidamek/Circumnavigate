@@ -318,6 +318,9 @@ public class PacketTransformer {
 		return ClientboundPlayerPositionPacket.STREAM_CODEC.decode(buffer);
 	}
 
+	private static ClientboundBlockEntityDataPacket transformPacket(ClientboundBlockEntityDataPacket packet, ServerPlayer player) {
+		return new ClientboundBlockEntityDataPacket(getClientBlockPos(player, packet.getPos()), packet.getType(), packet.getTag());
+	}
 
 	private static ClientboundAddEntityPacket transformPacket(ClientboundAddEntityPacket packet, ServerPlayer player) {
 		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());

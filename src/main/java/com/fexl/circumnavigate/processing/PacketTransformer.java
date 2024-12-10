@@ -14,9 +14,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.protocol.Packet;
@@ -27,15 +25,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Transforms packets into their wrapped counterparts.
@@ -117,6 +111,18 @@ public class PacketTransformer {
 		buffer.writeVarInt(newPos.z);
 		packet.getLightData().write(buffer);
 		return ClientboundLightUpdatePacket.STREAM_CODEC.decode(buffer);
+	}
+
+	private static ClientboundLevelChunkWithLightPacket transformPacket(ClientboundLevelChunkWithLightPacket packet, ServerPlayer player) {
+		RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.getServer().registryAccess());
+
+		ChunkPos newPos = getClientChunkPos(player, new ChunkPos(packet.getX(), packet.getZ()));
+		buffer.writeInt(newPos.x);
+		buffer.writeInt(newPos.z);
+		packet.getChunkData().write(buffer);
+		packet.getLightData().write(buffer);
+
+		return ClientboundLevelChunkWithLightPacket.STREAM_CODEC.decode(buffer);
 	}
 
 	private static ClientboundSetChunkCacheCenterPacket transformPacket(ClientboundSetChunkCacheCenterPacket packet, ServerPlayer player) {

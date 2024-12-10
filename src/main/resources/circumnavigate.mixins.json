@@ -53,7 +53,6 @@
     "packetHandle.ServerConfigurationPacketListenerImplMixin",
     "packetHandle.ServerGamePacketListenerImplMixin",
     "packetHandle.ServerGamePacketListenerImplMixin_1",
-    "packetHandle.packets.ClientboundLevelChunkWithLightPacketMixin",
     "worldInit.PathNavigationRegionMixin",
     "worldInit.PlayerListMixin",
     "worldInit.PrimaryLevelDataMixin",

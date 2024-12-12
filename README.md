@@ -17,25 +17,24 @@ Watch [this video](https://www.youtube.com/watch?v=bmkUSeLEE7Y) or read the [wik
 4. Wrapped player positioning (for proper block collision and interaction distance)
 5. Entity Handling (teleportation, hitboxes, spawning, riding)
 6. Vanilla client support
-7. Redstone/block update handling (redstone, explosions)
+7. Redstone/block update handling (redstone, explosions, light updates, fluids, pistons)
+8. Stopping over-bounds chunk generation and storage
 
 **Future Updates (🔴 Alpha):** (not exclusive)
 1. Entity handling (pathing)
 2. Proper nether limits and portal handling
 3. Proper spawning and respawning for irregular world limits. (Limits past (0,0))
-4. Redstone/block update handling (light updates, etc.)
-5. Stopping over-bounds chunk generation and storage
-7. Wrapped chunk shifting? (for fun)
+4. Overworld wrapped world generation
+5. Nether wrapped world generation
+6. Wrapped structure and feature generation
 
 **Future Updates (🟠 Beta/ 🟢 Release):**
 1. Wrapped coordinate support in commands?
-2. Map item support?
-3. Overworld wrapped world generation
-4. Nether wrapped world generation
-5. Wrapped structure generation
-6. Curvature shader?
-7. Developer API?
-8. Datapack coordinate wrapping?
+2. Wrapped chunk shifting? 
+3. Map item support? 
+4. Curvature shader? 
+5. Developer API? 
+6. Datapack coordinate wrapping?
 
 
 ## Tools

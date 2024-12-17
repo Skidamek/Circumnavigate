@@ -4,6 +4,7 @@
 
 package com.fexl.circumnavigate.mixin.worldgen;
 
+import com.fexl.circumnavigate.injected.NoiseScaling;
 import com.fexl.circumnavigate.processing.worldgen.OpenSimplex2S;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -42,23 +43,8 @@ public class BlendedNoiseMixin {
 		source = random.nextLong();
 	}
 
-	/**
+
 	public double compute(DensityFunction.FunctionContext context) {
-		int x = context.blockX();
-		int y = context.blockY();
-		int z = context.blockZ();
-
-		double xa = x / xWidth;
-		double za = z / zWidth;
-
-		double rxa = xa * 2.0 * Math.PI;
-		double rza = za * 2.0 * Math.PI;
-
-		double noise4 = OpenSimplex2S.noise4_Fallback(source, Math.sin(rxa), Math.cos(rxa), Math.sin(rza), Math.cos(rza));
-		//return OpenSimplex2S.noise2_ImproveX(context.blockX() + context.blockY() + context.blockZ(), noise4, y);
-		return noise4;
-	}**/
-		/**
 		double d = (double)context.blockX() * this.xzMultiplier;
 		double e = (double)context.blockY() * this.yMultiplier;
 		double f = (double)context.blockZ() * this.xzMultiplier;
@@ -76,6 +62,7 @@ public class BlendedNoiseMixin {
 		for (int p = 0; p < 8; p++) {
 			ImprovedNoise improvedNoise = this.mainNoise.getOctaveNoise(p);
 			if (improvedNoise != null) {
+				((NoiseScaling) (Object) improvedNoise).setNoiseScaling(o);
 				n += improvedNoise.noise(PerlinNoise.wrap(g * o), PerlinNoise.wrap(h * o), PerlinNoise.wrap(i * o), k * o, h * o) / o;
 			}
 
@@ -95,6 +82,7 @@ public class BlendedNoiseMixin {
 			if (!bl2) {
 				ImprovedNoise improvedNoise2 = this.minLimitNoise.getOctaveNoise(r);
 				if (improvedNoise2 != null) {
+					((NoiseScaling) (Object) improvedNoise2).setNoiseScaling(o);
 					l += improvedNoise2.noise(s, t, u, v, e * o) / o;
 				}
 			}
@@ -102,6 +90,7 @@ public class BlendedNoiseMixin {
 			if (!bl3) {
 				ImprovedNoise improvedNoise2 = this.maxLimitNoise.getOctaveNoise(r);
 				if (improvedNoise2 != null) {
+					((NoiseScaling) (Object) improvedNoise2).setNoiseScaling(o);
 					m += improvedNoise2.noise(s, t, u, v, e * o) / o;
 				}
 			}
@@ -110,5 +99,5 @@ public class BlendedNoiseMixin {
 		}
 
 		return Mth.clampedLerp(l / 512.0, m / 512.0, q) / 128.0;
-	}**/
+	}
 }

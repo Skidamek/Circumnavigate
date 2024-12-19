@@ -4,7 +4,7 @@
 
 package com.fexl.circumnavigate.mixin.worldgen;
 
-import com.fexl.circumnavigate.processing.worldgen.OpenSimplex2S;
+import com.fexl.circumnavigate.injected.NoiseScaling;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
@@ -16,11 +16,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(NormalNoise.class)
-public class NormalNoiseMixin {
+public class NormalNoiseMixin implements NoiseScaling {
 	@Shadow @Final private double valueFactor;
 	@Shadow @Final private PerlinNoise first;
 	@Shadow @Final private PerlinNoise second;
 
+	@Shadow @Final private double maxValue;
 	private final double xWidth = 256.0;
 	private final double zWidth = 256.0;
 
@@ -30,28 +31,53 @@ public class NormalNoiseMixin {
 		source = random.nextLong();
 	}
 
-	/**
 	public double getValue(double x, double y, double z) {
-		double xa = x / xWidth;
-		double za = z / zWidth;
 
-		double rxa = xa * 2.0 * Math.PI;
-		double rza = za * 2.0 * Math.PI;
+		double multiplier = 1.0181268882175227;
 
-		double noise4 = OpenSimplex2S.noise4_Fallback(source, Math.sin(rxa), Math.cos(rxa), Math.sin(rza), Math.cos(rza));
-		//return OpenSimplex2S.noise2_ImproveX(source, noise4, y);
-		double noise1 = OpenSimplex2S.noise2(source, 0, y);
+		double d = x * multiplier;
+		double e = y * multiplier;
+		double f = z * multiplier;
 
-		return (noise4 + noise1)/2.0;
+		NoiseScaling scaledFirst = ((NoiseScaling) (Object) this.first);
+		NoiseScaling scaledSecond = ((NoiseScaling) (Object) this.second);
 
-		//double d = x * 1.0181268882175227;
-		//double e = y * 1.0181268882175227;
-		//double f = z * 1.0181268882175227;
-		//return (this.first.getValue(x, y, z) + this.second.getValue(d, e, f)) * this.valueFactor;
-	}**/
+		scaledFirst.setXMul(xMul);
+		scaledSecond.setZMul(zMul);
+		scaledFirst.setXAdd(xAdd);
+		scaledFirst.setZAdd(zAdd);
+		scaledSecond.setXMul(multiplier * xMul);
+		scaledSecond.setZMul(multiplier * zMul);
+		scaledSecond.setXAdd(xAdd);
+		scaledSecond.setZAdd(zAdd);
 
-	public double getValue(double x, double y, double z) {
-		return (this.first.getValue(x, y, z));
+		return (this.first.getValue(x, y, z) + this.second.getValue(d, e, f)) * this.valueFactor;
+	}
+
+	double xMul = 1;
+	double zMul = 1;
+	double xAdd = 0;
+	double zAdd = 0;
+
+	public void setXMul(double xMul) {
+		this.xMul = xMul;
+	}
+
+	public void setZMul(double zMul) {
+		this.zMul = zMul;
+	}
+
+	public void setMul(double noiseScaling) {
+		this.xMul = noiseScaling;
+		this.zMul = noiseScaling;
+	}
+
+	public void setXAdd(double xAdd) {
+		this.xAdd = xAdd;
+	}
+
+	public void setZAdd(double zAdd) {
+		this.zAdd = zAdd;
 	}
 
 

@@ -30,6 +30,7 @@ public abstract class ChunkTrackerMixin extends DynamicGraphMinFixedPoint {
 	/**
 	 * Modifies ChunkPos to use wrapped chunks. This is essentially what fixes #10.
 	 */
+	/**
 	@WrapOperation(method = "getComputedLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ChunkTracker;computeLevelFromNeighbor(JJI)I"))
 	private int getComputedLevel(ChunkTracker instance, long startPos, long endPos, int startLevel, Operation<Integer> original, @Local(argsOnly = true, ordinal = 1) long excludedSourcePos) {
 		int originalRet = original.call(instance, startPos, endPos, startLevel);
@@ -51,7 +52,7 @@ public abstract class ChunkTrackerMixin extends DynamicGraphMinFixedPoint {
 		}
 
 	    return originalRet;
-	}
+	}**/
 
 	/**
 	 * Updates loading levels of adjacent chunks so they are ready when needed. Modified to include wrapped chunks.

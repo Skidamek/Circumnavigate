@@ -59,8 +59,8 @@ public abstract class ImprovedNoiseMixin implements NoiseScaling {
 			n = 0.0;
 		}
 
-		double xa = x / (xWidth * noiseScaling);
-		double za = z / (zWidth * noiseScaling);
+		double xa = ((x - xAdd) / xMul) / (xWidth);
+		double za = ((z - zAdd) / zMul) / (zWidth);
 
 		double rxa = xa * 2.0 * Math.PI;
 		double rza = za * 2.0 * Math.PI;
@@ -70,12 +70,32 @@ public abstract class ImprovedNoiseMixin implements NoiseScaling {
 		return (noise4 + noise1)/2.0;
 	}
 
-	double noiseScaling;
+	double xMul = 1;
+	double zMul = 1;
+	double xAdd = 0;
+	double zAdd = 0;
 
-	public void setNoiseScaling(double noiseScaling) {
-		this.noiseScaling = noiseScaling;
+	public void setMul(double noiseScaling) {
+		this.xMul = noiseScaling;
+		this.zMul = noiseScaling;
 	}
 
-	private final double xWidth = 256.0;
-	private final double zWidth = 256.0;
+	public void setXMul(double xMul) {
+		this.xMul = xMul;
+	}
+
+	public void setZMul(double zMul) {
+		this.zMul = zMul;
+	}
+
+	public void setXAdd(double xAdd) {
+		this.xAdd = xAdd;
+	}
+
+	public void setZAdd(double zAdd) {
+		this.zAdd = zAdd;
+	}
+
+	private final double xWidth = 1024.0;
+	private final double zWidth = 1024.0;
 }

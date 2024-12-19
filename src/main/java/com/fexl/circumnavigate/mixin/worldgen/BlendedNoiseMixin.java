@@ -5,7 +5,6 @@
 package com.fexl.circumnavigate.mixin.worldgen;
 
 import com.fexl.circumnavigate.injected.NoiseScaling;
-import com.fexl.circumnavigate.processing.worldgen.OpenSimplex2S;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.DensityFunction;
@@ -38,6 +37,8 @@ public class BlendedNoiseMixin {
 
 	private long source;
 
+	private long lastTime = 0;
+
 	@Inject(method = "<init>(Lnet/minecraft/util/RandomSource;DDDDD)V", at = @At("TAIL"))
 	public void init(RandomSource random, double xzScale, double yScale, double xzFactor, double yFactor, double smearScaleMultiplier, CallbackInfo ci) {
 		source = random.nextLong();
@@ -62,7 +63,7 @@ public class BlendedNoiseMixin {
 		for (int p = 0; p < 8; p++) {
 			ImprovedNoise improvedNoise = this.mainNoise.getOctaveNoise(p);
 			if (improvedNoise != null) {
-				((NoiseScaling) (Object) improvedNoise).setNoiseScaling(o);
+				((NoiseScaling) (Object) improvedNoise).setMul(this.xzFactor / (o * xzMultiplier));
 				n += improvedNoise.noise(PerlinNoise.wrap(g * o), PerlinNoise.wrap(h * o), PerlinNoise.wrap(i * o), k * o, h * o) / o;
 			}
 
@@ -82,7 +83,7 @@ public class BlendedNoiseMixin {
 			if (!bl2) {
 				ImprovedNoise improvedNoise2 = this.minLimitNoise.getOctaveNoise(r);
 				if (improvedNoise2 != null) {
-					((NoiseScaling) (Object) improvedNoise2).setNoiseScaling(o);
+					((NoiseScaling) (Object) improvedNoise2).setMul(this.xzMultiplier * o);
 					l += improvedNoise2.noise(s, t, u, v, e * o) / o;
 				}
 			}
@@ -90,7 +91,7 @@ public class BlendedNoiseMixin {
 			if (!bl3) {
 				ImprovedNoise improvedNoise2 = this.maxLimitNoise.getOctaveNoise(r);
 				if (improvedNoise2 != null) {
-					((NoiseScaling) (Object) improvedNoise2).setNoiseScaling(o);
+					((NoiseScaling) (Object) improvedNoise2).setMul(this.xzMultiplier * o);
 					m += improvedNoise2.noise(s, t, u, v, e * o) / o;
 				}
 			}

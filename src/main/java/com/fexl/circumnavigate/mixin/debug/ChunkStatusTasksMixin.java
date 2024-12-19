@@ -24,8 +24,8 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(ChunkStatusTasks.class)
 public class ChunkStatusTasksMixin {
-	@Unique private final static boolean STRUCTURE_STARTS         = true;
-	@Unique private final static boolean STRUCTURE_REFERENCES     = true;
+	@Unique private final static boolean STRUCTURE_STARTS         = false;
+	@Unique private final static boolean STRUCTURE_REFERENCES     = false;
 	@Unique private final static boolean BIOMES                   = true;
 	@Unique private final static boolean NOISE                    = true;
 	@Unique private final static boolean SURFACE                  = true;

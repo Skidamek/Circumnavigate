@@ -80,3 +80,11 @@ accessible field net/minecraft/server/level/ChunkMap$TrackedEntity entity Lnet/m
 accessible class net/minecraft/server/level/ChunkMap$DistanceManager
 accessible method net/minecraft/server/level/DistanceManager removePlayer (Lnet/minecraft/core/SectionPos;Lnet/minecraft/server/level/ServerPlayer;)V
 accessible method net/minecraft/server/level/DistanceManager addPlayer (Lnet/minecraft/core/SectionPos;Lnet/minecraft/server/level/ServerPlayer;)V
+
+#Terrain gen wideners
+accessible method net/minecraft/world/level/levelgen/blending/BlendingData iterateBiomes (IIILnet/minecraft/world/level/levelgen/blending/BlendingData$BiomeConsumer;)V
+accessible class net/minecraft/world/level/levelgen/blending/BlendingData$BiomeConsumer
+
+#Density Function Wideners
+accessible class net/minecraft/world/level/levelgen/DensityFunctions$WeirdScaledSampler
+accessible field net/minecraft/world/level/levelgen/DensityFunctions$WeirdScaledSampler$RarityValueMapper mapper Lit/unimi/dsi/fastutil/doubles/Double2DoubleFunction;

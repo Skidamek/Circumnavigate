@@ -5,7 +5,6 @@
 package com.fexl.circumnavigate.mixin.worldgen;
 
 import com.fexl.circumnavigate.injected.NoiseScaling;
-import com.fexl.circumnavigate.processing.worldgen.OpenSimplex2S;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.util.RandomSource;
@@ -19,11 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PerlinNoise.class)
-public abstract class PerlinNoiseMixin {
-	@Shadow
-	public static double wrap(double value) {
-		return 0;
-	}
+public abstract class PerlinNoiseMixin implements NoiseScaling {
 
 	@Shadow @Final private ImprovedNoise[] noiseLevels;
 	@Shadow @Final private int firstOctave;
@@ -34,6 +29,8 @@ public abstract class PerlinNoiseMixin {
 	
 	private final double xWidth = 256.0;
 	private final double zWidth = 256.0;
+
+	//PerlinNoise thiz = (PerlinNoise) (Object) this;
 
 	private long source;
 
@@ -50,23 +47,12 @@ public abstract class PerlinNoiseMixin {
 		for (int i = 0; i < this.noiseLevels.length; i++) {
 			ImprovedNoise improvedNoise = this.noiseLevels[i];
 			if (improvedNoise != null) {
-				((NoiseScaling) (Object) improvedNoise).setNoiseScaling(e);
-				double g = improvedNoise.noise(wrap(x * e), useFixedY ? -improvedNoise.yo : wrap(y * e), wrap(z * e), yScale * e, yMax * e);
-
-				///////
-				/**
-				long random = (long) (improvedNoise.xo + improvedNoise.yo + improvedNoise.zo);
-				double xa = x / xWidth;
-				double za = z / zWidth;
-
-				double rxa = xa * 2.0 * Math.PI;
-				double rza = za * 2.0 * Math.PI;
-
-				double noise4 = OpenSimplex2S.noise4_Fallback(random, Math.sin(rxa), Math.cos(rxa), Math.sin(rza), Math.cos(rza));
-				double noise1 = OpenSimplex2S.noise2(random, 0, useFixedY ? -improvedNoise.yo : y);
-				double g = (noise4 + noise1)/2.0;**/
-				///////
-
+				NoiseScaling scaledNoise = ((NoiseScaling) (Object) improvedNoise);
+				scaledNoise.setXMul(e * xMul);
+				scaledNoise.setZMul(e * zMul);
+				scaledNoise.setXAdd(xAdd);
+				scaledNoise.setZAdd(zAdd);
+				double g = improvedNoise.noise(PerlinNoise.wrap(x * e), useFixedY ? -improvedNoise.yo : PerlinNoise.wrap(y * e), PerlinNoise.wrap(z * e), yScale * e, yMax * e);
 				d += this.amplitudes.getDouble(i) * g * f;
 			}
 
@@ -77,34 +63,29 @@ public abstract class PerlinNoiseMixin {
 		return d;
 	}
 
-	/**
-	public double getValue(double x, double y, double z, double yScale, double yMax, boolean useFixedY) {
+	double xMul = 1;
+	double zMul = 1;
+	double xAdd = 0;
+	double zAdd = 0;
 
-		double xa = x / xWidth;
-		double za = z / zWidth;
+	public void setMul(double noiseScaling) {
+		this.xMul = noiseScaling;
+		this.zMul = noiseScaling;
+	}
 
-		double rxa = xa * 2.0 * Math.PI;
-		double rza = za * 2.0 * Math.PI;
+	public void setXMul(double xMul) {
+		this.xMul = xMul;
+	}
 
-		double noise4 = OpenSimplex2S.noise4_Fallback(source, Math.sin(rxa), Math.cos(rxa), Math.sin(rza), Math.cos(rza));
-		//return OpenSimplex2S.noise2_ImproveX(source, noise4, y);
-		return noise4;
+	public void setZMul(double zMul) {
+		this.zMul = zMul;
+	}
 
-		double d = 0.0;
-		double e = this.lowestFreqInputFactor;
-		double f = this.lowestFreqValueFactor;
+	public void setXAdd(double xAdd) {
+		this.xAdd = xAdd;
+	}
 
-		for (int i = 0; i < this.noiseLevels.length; i++) {
-			ImprovedNoise improvedNoise = this.noiseLevels[i];
-			if (improvedNoise != null) {
-				double g = improvedNoise.noise(wrap(x * e), useFixedY ? -improvedNoise.yo : wrap(y * e), wrap(z * e), yScale * e, yMax * e);
-				d += this.amplitudes.getDouble(i) * g * f;
-			}
-
-			e *= 2.0;
-			f /= 2.0;
-		}
-
-		return d;
-	}**/
+	public void setZAdd(double zAdd) {
+		this.zAdd = zAdd;
+	}
 }

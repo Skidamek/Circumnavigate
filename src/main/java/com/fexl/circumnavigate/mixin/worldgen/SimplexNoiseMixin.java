@@ -6,10 +6,7 @@ package com.fexl.circumnavigate.mixin.worldgen;
 
 import com.fexl.circumnavigate.injected.NoiseScaling;
 import com.fexl.circumnavigate.processing.worldgen.OpenSimplex2S;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.levelgen.LegacyRandomSource;
-import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,8 +27,8 @@ public abstract class SimplexNoiseMixin implements NoiseScaling {
 	@Final @Shadow abstract public int p(int index);
 	@Final @Shadow abstract public double getCornerNoise3D(int gradientIndex, double x, double y, double z, double offset);
 
-	private int xWidth = 256;
-	private int zWidth = 256;
+	private double xWidth = 1024.0;
+	private double zWidth = 1024.0;
 
 	private long source;
 
@@ -41,8 +38,8 @@ public abstract class SimplexNoiseMixin implements NoiseScaling {
 	}
 
 	public double getValue(double x, double y) {
-		double xa = x - (isOffset ? this.xo : 0.0) / (xWidth * xScaling);
-		double za = y - (isOffset ? this.zo : 0.0) / (zWidth * zScaling);
+		double xa = ((x - xAdd) / xMul) / (xWidth);
+		double za = ((y - zAdd) / zMul) / (zWidth);
 
 		double rxa = xa * 2.0 * Math.PI;
 		double rza = za * 2.0 * Math.PI;
@@ -51,8 +48,8 @@ public abstract class SimplexNoiseMixin implements NoiseScaling {
 	}
 
 	public double getValue(double x, double y, double z) {
-		double xa = x - (isOffset ? this.xo : 0.0) / (xWidth * xScaling);
-		double za = z - (isOffset ? this.zo : 0.0) / (zWidth * zScaling);
+		double xa = ((x - xAdd) / xMul) / (xWidth);
+		double za = ((z - zAdd) / zMul) / (zWidth);
 
 		double rxa = xa * 2.0 * Math.PI;
 		double rza = za * 2.0 * Math.PI;
@@ -62,33 +59,29 @@ public abstract class SimplexNoiseMixin implements NoiseScaling {
 		return (noise4 + noise1)/2.0;
 	}
 
-	double xScaling = 1;
-	double zScaling = 1;
-	boolean isOffset = false;
+	double xMul = 1;
+	double zMul = 1;
+	double xAdd = 0;
+	double zAdd = 0;
 
-	public void setXScaling(double xScaling) {
-		this.xScaling = xScaling;
+	public void setMul(double noiseScaling) {
+		this.xMul = noiseScaling;
+		this.zMul = noiseScaling;
 	}
 
-	public void setZScaling(double zScaling) {
-		this.zScaling = zScaling;
+	public void setXMul(double xMul) {
+		this.xMul = xMul;
 	}
 
-	public void setNoiseScaling(double noiseScaling) {
-		this.xScaling = noiseScaling;
-		this.zScaling = noiseScaling;
+	public void setZMul(double zMul) {
+		this.zMul = zMul;
 	}
 
-	public void setOffset(boolean isOffset) {
-		this.isOffset = isOffset;
+	public void setXAdd(double xAdd) {
+		this.xAdd = xAdd;
 	}
 
-	/**
-	public double getValue(double x, double y) {
-		return 70 * OpenSimplex2S.noise2((long) (xo + yo + zo), x, y);
+	public void setZAdd(double zAdd) {
+		this.zAdd = zAdd;
 	}
-
-	public double getValue(double x, double y, double z) {
-		return 32 * OpenSimplex2S.noise3_Fallback((long) (xo + yo + zo), x, y, z);
-	}**/
 }

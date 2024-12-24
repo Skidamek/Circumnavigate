@@ -17,7 +17,7 @@ public class NoiseBasedStateProviderMixin {
 	@Shadow @Final protected NormalNoise noise;
 
 	public double getNoiseValue(BlockPos pos, double delta) {
-		//((NoiseScaling) (Object) this.noise).setMul(delta);
+		((NoiseScaling) (Object) this.noise).setMul(delta);
 		//return this.noise.getValue((double)pos.getX() * delta, (double)pos.getY() * delta, (double)pos.getZ() * delta);
 		return this.noise.getValue((double)pos.getX(), (double)pos.getY() * delta, (double)pos.getZ());
 	}

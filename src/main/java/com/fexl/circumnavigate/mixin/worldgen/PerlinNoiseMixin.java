@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PerlinNoise.class)
-public abstract class PerlinNoiseMixin implements NoiseScaling {
+public class PerlinNoiseMixin implements NoiseScaling {
 
 	@Shadow @Final private ImprovedNoise[] noiseLevels;
 	@Shadow @Final private int firstOctave;
@@ -52,7 +52,9 @@ public abstract class PerlinNoiseMixin implements NoiseScaling {
 				scaledNoise.setZMul(e * zMul);
 				scaledNoise.setXAdd(xAdd);
 				scaledNoise.setZAdd(zAdd);
-				double g = improvedNoise.noise(PerlinNoise.wrap(x * e), useFixedY ? -improvedNoise.yo : PerlinNoise.wrap(y * e), PerlinNoise.wrap(z * e), yScale * e, yMax * e);
+
+				//double g = improvedNoise.noise(PerlinNoise.wrap(x * e), useFixedY ? -improvedNoise.yo : PerlinNoise.wrap(y * e), PerlinNoise.wrap(z * e), yScale * e, yMax * e);
+				double g = improvedNoise.noise(x, useFixedY ? -improvedNoise.yo : PerlinNoise.wrap(y * e), z, yScale * e, yMax * e);
 				d += this.amplitudes.getDouble(i) * g * f;
 			}
 
@@ -68,11 +70,6 @@ public abstract class PerlinNoiseMixin implements NoiseScaling {
 	double xAdd = 0;
 	double zAdd = 0;
 
-	public void setMul(double noiseScaling) {
-		this.xMul = noiseScaling;
-		this.zMul = noiseScaling;
-	}
-
 	public void setXMul(double xMul) {
 		this.xMul = xMul;
 	}
@@ -87,5 +84,25 @@ public abstract class PerlinNoiseMixin implements NoiseScaling {
 
 	public void setZAdd(double zAdd) {
 		this.zAdd = zAdd;
+	}
+
+	@Override
+	public double getXMul() {
+		return xMul;
+	}
+
+	@Override
+	public double getZMul() {
+		return zMul;
+	}
+
+	@Override
+	public double getXAdd() {
+		return xAdd;
+	}
+
+	@Override
+	public double getZAdd() {
+		return zAdd;
 	}
 }

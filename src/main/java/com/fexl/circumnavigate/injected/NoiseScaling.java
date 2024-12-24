@@ -5,7 +5,7 @@
 package com.fexl.circumnavigate.injected;
 
 public interface NoiseScaling {
-	void setMul(double noiseScaling);
+	default void setMul(double mul) { setXMul(mul); setZMul(mul);}
 	void setXMul(double xMul);
 	void setZMul(double zMul);
 	void setXAdd(double xAdd);

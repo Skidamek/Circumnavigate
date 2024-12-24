@@ -14,7 +14,7 @@ public interface DensityFunctions$ShiftNoiseMixin {
 	@Shadow DensityFunction.NoiseHolder offsetNoise();
 
 	default double compute(double x, double y, double z) {
-		//((NoiseScaling) (Object) offsetNoise()).setMul(0.25);
+		((NoiseScaling) (Object) offsetNoise()).setMul(0.25);
 		//return this.offsetNoise().getValue(x * 0.25, y * 0.25, z * 0.25) * 4.0;
 		return this.offsetNoise().getValue(x, y * 0.25, z) * 4.0;
 	}

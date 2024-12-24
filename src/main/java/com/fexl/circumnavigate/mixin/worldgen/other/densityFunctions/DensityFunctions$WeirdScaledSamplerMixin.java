@@ -20,8 +20,8 @@ public class DensityFunctions$WeirdScaledSamplerMixin {
 	public double transform(DensityFunction.FunctionContext context, double value) {
 		double d = this.rarityValueMapper.mapper.get(value);
 
-		//((NoiseScaling) (Object) noise).setMul(1/d);
+		((NoiseScaling) (Object) noise).setMul(1/d);
 		//return d * Math.abs(this.noise.getValue((double)context.blockX() / d, (double)context.blockY() / d, (double)context.blockZ() / d));
-		return Math.abs(this.noise.getValue((double)context.blockX(), (double)context.blockY() / d, (double)context.blockZ()));
+		return Math.abs(this.noise.getValue(context.blockX(), (double)context.blockY() / d, context.blockZ()));
 	}
 }

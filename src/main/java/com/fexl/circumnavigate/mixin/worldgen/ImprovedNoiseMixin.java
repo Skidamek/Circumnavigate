@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ImprovedNoise.class)
-public abstract class ImprovedNoiseMixin implements NoiseScaling {
+public class ImprovedNoiseMixin implements NoiseScaling {
 	ImprovedNoise thiz = (ImprovedNoise) (Object) this;
 	//private final int seed = 2497518;
 	//private final long randomSource = new WorldgenRandom(new LegacyRandomSource(seed)).nextLong();
@@ -59,8 +59,10 @@ public abstract class ImprovedNoiseMixin implements NoiseScaling {
 			n = 0.0;
 		}
 
-		double xa = ((x - xAdd) / xMul) / (xWidth);
-		double za = ((z - zAdd) / zMul) / (zWidth);
+		//double xa = ((x - xAdd) / xMul) / (xWidth);
+		//double za = ((z - zAdd) / zMul) / (zWidth);
+		double xa = x / xWidth;
+		double za = z / zWidth;
 
 		double rxa = xa * 2.0 * Math.PI;
 		double rza = za * 2.0 * Math.PI;
@@ -74,11 +76,6 @@ public abstract class ImprovedNoiseMixin implements NoiseScaling {
 	double zMul = 1;
 	double xAdd = 0;
 	double zAdd = 0;
-
-	public void setMul(double noiseScaling) {
-		this.xMul = noiseScaling;
-		this.zMul = noiseScaling;
-	}
 
 	public void setXMul(double xMul) {
 		this.xMul = xMul;
@@ -95,6 +92,27 @@ public abstract class ImprovedNoiseMixin implements NoiseScaling {
 	public void setZAdd(double zAdd) {
 		this.zAdd = zAdd;
 	}
+
+	@Override
+	public double getXMul() {
+		return xMul;
+	}
+
+	@Override
+	public double getZMul() {
+		return zMul;
+	}
+
+	@Override
+	public double getXAdd() {
+		return xAdd;
+	}
+
+	@Override
+	public double getZAdd() {
+		return zAdd;
+	}
+
 
 	private final double xWidth = 1024.0;
 	private final double zWidth = 1024.0;

@@ -18,8 +18,8 @@ public class DensityFunctions$NoiseMixin {
 	@Shadow @Final private double yScale;
 
 	public double compute(DensityFunction.FunctionContext context) {
-		//((NoiseScaling) (Object) noise).setMul(this.xzScale);
-		//return this.noise.getValue((double)context.blockX() * this.xzScale, (double)context.blockY() * this.yScale, (double)context.blockZ() * this.xzScale);
-		return this.noise.getValue((double)context.blockX(), (double)context.blockY() * this.yScale, (double)context.blockZ());
+		((NoiseScaling) (Object) noise).setMul(this.xzScale);
+		//return this.noise.getValue(context.blockX() * this.xzScale, (double)context.blockY() * this.yScale, context.blockZ() * this.xzScale);
+		return this.noise.getValue(context.blockX(), (double)context.blockY() * this.yScale, context.blockZ());
 	}
 }

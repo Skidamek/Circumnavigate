@@ -20,7 +20,6 @@ public class DensityFunctions$ShiftedNoiseMixin {
 	@Shadow @Final private DensityFunction.NoiseHolder noise;
 
 	public double compute(DensityFunction.FunctionContext context) {
-		/**
 		NoiseScaling scaledNoise = ((NoiseScaling) (Object) noise);
 		scaledNoise.setMul(this.xzScale);
 		scaledNoise.setXAdd(this.shiftX.compute(context));
@@ -29,7 +28,8 @@ public class DensityFunctions$ShiftedNoiseMixin {
 		double d = (double)context.blockX() * this.xzScale + this.shiftX.compute(context);
 		double e = (double)context.blockY() * this.yScale + this.shiftY.compute(context);
 		double f = (double)context.blockZ() * this.xzScale + this.shiftZ.compute(context);
-		return this.noise.getValue(d, e, f);**/
+
+		//return this.noise.getValue(d, e, f);
 		return this.noise.getValue(context.blockX(), context.blockY() * this.yScale + this.shiftY.compute(context), context.blockZ());
 	}
 }

@@ -38,8 +38,10 @@ public abstract class SimplexNoiseMixin implements NoiseScaling {
 	}
 
 	public double getValue(double x, double y) {
-		double xa = ((x - xAdd) / xMul) / (xWidth);
-		double za = ((y - zAdd) / zMul) / (zWidth);
+		//double xa = ((x - xAdd) / xMul) / (xWidth);
+		//double za = ((y - zAdd) / zMul) / (zWidth);
+		double xa = x / xWidth;
+		double za = y / zWidth;
 
 		double rxa = xa * 2.0 * Math.PI;
 		double rza = za * 2.0 * Math.PI;
@@ -48,8 +50,10 @@ public abstract class SimplexNoiseMixin implements NoiseScaling {
 	}
 
 	public double getValue(double x, double y, double z) {
-		double xa = ((x - xAdd) / xMul) / (xWidth);
-		double za = ((z - zAdd) / zMul) / (zWidth);
+		//double xa = ((x - xAdd) / xMul) / (xWidth);
+		//double za = ((z - zAdd) / zMul) / (zWidth);
+		double xa = x / xWidth;
+		double za = z / zWidth;
 
 		double rxa = xa * 2.0 * Math.PI;
 		double rza = za * 2.0 * Math.PI;
@@ -63,11 +67,6 @@ public abstract class SimplexNoiseMixin implements NoiseScaling {
 	double zMul = 1;
 	double xAdd = 0;
 	double zAdd = 0;
-
-	public void setMul(double noiseScaling) {
-		this.xMul = noiseScaling;
-		this.zMul = noiseScaling;
-	}
 
 	public void setXMul(double xMul) {
 		this.xMul = xMul;
@@ -83,5 +82,25 @@ public abstract class SimplexNoiseMixin implements NoiseScaling {
 
 	public void setZAdd(double zAdd) {
 		this.zAdd = zAdd;
+	}
+
+	@Override
+	public double getXMul() {
+		return xMul;
+	}
+
+	@Override
+	public double getZMul() {
+		return zMul;
+	}
+
+	@Override
+	public double getXAdd() {
+		return xAdd;
+	}
+
+	@Override
+	public double getZAdd() {
+		return zAdd;
 	}
 }

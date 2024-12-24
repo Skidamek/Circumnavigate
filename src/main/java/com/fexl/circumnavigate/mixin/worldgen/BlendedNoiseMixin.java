@@ -46,9 +46,9 @@ public class BlendedNoiseMixin {
 
 
 	public double compute(DensityFunction.FunctionContext context) {
-		double d = (double)context.blockX() * this.xzMultiplier;
-		double e = (double)context.blockY() * this.yMultiplier;
-		double f = (double)context.blockZ() * this.xzMultiplier;
+		double d = context.blockX() * this.xzMultiplier;
+		double e = context.blockY() * this.yMultiplier;
+		double f = context.blockZ() * this.xzMultiplier;
 		double g = d / this.xzFactor;
 		double h = e / this.yFactor;
 		double i = f / this.xzFactor;
@@ -64,7 +64,8 @@ public class BlendedNoiseMixin {
 			ImprovedNoise improvedNoise = this.mainNoise.getOctaveNoise(p);
 			if (improvedNoise != null) {
 				((NoiseScaling) (Object) improvedNoise).setMul(this.xzFactor / (o * xzMultiplier));
-				n += improvedNoise.noise(PerlinNoise.wrap(g * o), PerlinNoise.wrap(h * o), PerlinNoise.wrap(i * o), k * o, h * o) / o;
+				//n += improvedNoise.noise(PerlinNoise.wrap(g * o), PerlinNoise.wrap(h * o), PerlinNoise.wrap(i * o), k * o, h * o) / o;
+				n += improvedNoise.noise(context.blockX(), PerlinNoise.wrap(h * o), context.blockZ(), k * o, h * o) / o;
 			}
 
 			o /= 2.0;
@@ -76,7 +77,7 @@ public class BlendedNoiseMixin {
 		o = 1.0;
 
 		for (int r = 0; r < 16; r++) {
-			double s = PerlinNoise.wrap(d * o);
+			double s = d * o; //PerlinNoise.wrap(d * o);
 			double t = PerlinNoise.wrap(e * o);
 			double u = PerlinNoise.wrap(f * o);
 			double v = j * o;
@@ -84,7 +85,8 @@ public class BlendedNoiseMixin {
 				ImprovedNoise improvedNoise2 = this.minLimitNoise.getOctaveNoise(r);
 				if (improvedNoise2 != null) {
 					((NoiseScaling) (Object) improvedNoise2).setMul(this.xzMultiplier * o);
-					l += improvedNoise2.noise(s, t, u, v, e * o) / o;
+					//l += improvedNoise2.noise(s, t, u, v, e * o) / o;
+					l += improvedNoise2.noise(context.blockX(), t, context.blockZ(), v, e * o) / o;
 				}
 			}
 
@@ -92,7 +94,8 @@ public class BlendedNoiseMixin {
 				ImprovedNoise improvedNoise2 = this.maxLimitNoise.getOctaveNoise(r);
 				if (improvedNoise2 != null) {
 					((NoiseScaling) (Object) improvedNoise2).setMul(this.xzMultiplier * o);
-					m += improvedNoise2.noise(s, t, u, v, e * o) / o;
+					//m += improvedNoise2.noise(s, t, u, v, e * o) / o;
+					m += improvedNoise2.noise(context.blockX(), t, context.blockZ(), v, e * o) / o;
 				}
 			}
 

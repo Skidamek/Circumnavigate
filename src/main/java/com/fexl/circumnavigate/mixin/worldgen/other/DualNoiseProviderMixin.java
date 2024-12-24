@@ -18,7 +18,7 @@ public class DualNoiseProviderMixin {
 	@Shadow @Final private NormalNoise slowNoise;
 
 	public double getSlowNoiseValue(BlockPos pos) {
-		//((NoiseScaling) (Object) this.slowNoise).setMul(this.slowScale);
+		((NoiseScaling) (Object) this.slowNoise).setMul(this.slowScale);
 		//return this.slowNoise.getValue((double)((float)pos.getX() * this.slowScale), (double)((float)pos.getY() * this.slowScale), (double)((float)pos.getZ() * this.slowScale));
 		return this.slowNoise.getValue((double)((float)pos.getX()), (double)((float)pos.getY() * this.slowScale), (double)((float)pos.getZ()));
 	}

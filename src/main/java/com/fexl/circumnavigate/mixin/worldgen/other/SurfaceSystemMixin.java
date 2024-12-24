@@ -56,7 +56,7 @@ public class SurfaceSystemMixin {
 		if (!(e <= 0.0)) {
 			double f = 0.75;
 			double g = 1.5;
-			//((NoiseScaling) (Object) this.badlandsPillarRoofNoise).setMul(0.75);
+			((NoiseScaling) (Object) this.badlandsPillarRoofNoise).setMul(0.75);
 			//double h = Math.abs(this.badlandsPillarRoofNoise.getValue((double)x * 0.75, 0.0, (double)z * 0.75) * 1.5);
 			double h = Math.abs(this.badlandsPillarRoofNoise.getValue((double)x, 0.0, (double)z) * 1.5);
 			double i = 64.0 + Math.min(e * e * 2.5, Math.ceil(h * 50.0) + 24.0);
@@ -83,13 +83,13 @@ public class SurfaceSystemMixin {
 	private void frozenOceanExtension(int minSurfaceLevel, Biome biome, BlockColumn blockColumn, BlockPos.MutableBlockPos topWaterPos, int x, int z, int height) {
 		double d = 1.28;
 
-		//((NoiseScaling) (Object) this.icebergPillarNoise).setMul(1.28);
+		((NoiseScaling) (Object) this.icebergPillarNoise).setMul(1.28);
 		//double e = Math.min(Math.abs(this.icebergSurfaceNoise.getValue((double)x, 0.0, (double)z) * 8.25), this.icebergPillarNoise.getValue((double)x * 1.28, 0.0, (double)z * 1.28) * 15.0);
 		double e = Math.min(Math.abs(this.icebergSurfaceNoise.getValue((double)x, 0.0, (double)z) * 8.25), this.icebergPillarNoise.getValue((double)x, 0.0, (double)z) * 15.0);
 		if (!(e <= 1.8)) {
 			double f = 1.17;
 			double g = 1.5;
-			//((NoiseScaling) (Object) this.icebergPillarRoofNoise).setMul(1.17);
+			((NoiseScaling) (Object) this.icebergPillarRoofNoise).setMul(1.17);
 			//double h = Math.abs(this.icebergPillarRoofNoise.getValue((double)x * 1.17, 0.0, (double)z * 1.17) * 1.5);
 			double h = Math.abs(this.icebergPillarRoofNoise.getValue((double)x, 0.0, (double)z) * 1.5);
 			double i = Math.min(e * e * 1.2, Math.ceil(h * 40.0) + 14.0);

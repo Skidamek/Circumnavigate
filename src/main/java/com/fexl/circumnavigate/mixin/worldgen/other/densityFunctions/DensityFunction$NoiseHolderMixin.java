@@ -17,6 +17,8 @@ public class DensityFunction$NoiseHolderMixin implements NoiseScaling {
 	@Shadow @Final private Holder<NormalNoise.NoiseParameters> noiseData;
 	@Shadow @Final private @Nullable NormalNoise noise;
 
+	private long lastTime =0;
+
 	public double getValue(double x, double y, double z) {
 		if(this.noise == null) {
 			return 0.0;
@@ -36,12 +38,6 @@ public class DensityFunction$NoiseHolderMixin implements NoiseScaling {
 	double zMul = 1;
 	double xAdd = 0;
 	double zAdd = 0;
-
-	@Override
-	public void setMul(double mul) {
-		this.xMul = mul;
-		this.zMul = mul;
-	}
 
 	@Override
 	public void setXMul(double xMul) {

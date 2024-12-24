@@ -25,6 +25,8 @@ public class NormalNoiseMixin implements NoiseScaling {
 	private final double xWidth = 256.0;
 	private final double zWidth = 256.0;
 
+	private long lastTime = 0;
+
 	private long source;
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void init(RandomSource random, NormalNoise.NoiseParameters parameters, boolean useLegacyNetherBiome, CallbackInfo ci) {
@@ -43,7 +45,7 @@ public class NormalNoiseMixin implements NoiseScaling {
 		NoiseScaling scaledSecond = ((NoiseScaling) (Object) this.second);
 
 		scaledFirst.setXMul(xMul);
-		scaledSecond.setZMul(zMul);
+		scaledFirst.setZMul(zMul);
 		scaledFirst.setXAdd(xAdd);
 		scaledFirst.setZAdd(zAdd);
 		scaledSecond.setXMul(multiplier * xMul);
@@ -51,7 +53,8 @@ public class NormalNoiseMixin implements NoiseScaling {
 		scaledSecond.setXAdd(xAdd);
 		scaledSecond.setZAdd(zAdd);
 
-		return (this.first.getValue(x, y, z) + this.second.getValue(d, e, f)) * this.valueFactor;
+		return (this.first.getValue(x, y, z) + this.second.getValue(x, y, z)) * this.valueFactor;
+		//return (this.first.getValue(x, y, z) + this.second.getValue(d, e, f)) * this.valueFactor;
 	}
 
 	double xMul = 1;
@@ -67,17 +70,28 @@ public class NormalNoiseMixin implements NoiseScaling {
 		this.zMul = zMul;
 	}
 
-	public void setMul(double noiseScaling) {
-		this.xMul = noiseScaling;
-		this.zMul = noiseScaling;
-	}
-
 	public void setXAdd(double xAdd) {
 		this.xAdd = xAdd;
 	}
 
 	public void setZAdd(double zAdd) {
 		this.zAdd = zAdd;
+	}
+
+	public double getXMul() {
+		return xMul;
+	}
+
+	public double getZMul() {
+		return zMul;
+	}
+
+	public double getXAdd() {
+		return xAdd;
+	}
+
+	public double getZAdd() {
+		return zAdd;
 	}
 
 
